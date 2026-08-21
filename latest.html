@@ -697,7 +697,7 @@
         <p>종별과 팀 수를 자유롭게 설정하고, 참가팀 명단과 공개 추첨번호로 공정하게 대진을 추첨합니다.</p>
         <div class="local-data-note">※ 모든 데이터는 현재 사용 중인 PC의 브라우저에만 저장되며 다른 사용자와 공유되지 않습니다.</div>
         <div class="maker-credit">제작 <strong>부산백양고 신태규</strong></div>
-        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.15</span></div>
+        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.16</span></div>
       </div>
       <div class="hero-tools no-print">
         <button class="btn btn-soft" id="fullscreenBtn">전체화면</button>
@@ -903,7 +903,7 @@
       <div class="modal-body">
         <div class="update-status" id="updateStatus">최신 버전 정보를 확인하려면 아래 버튼을 눌러 주세요.</div>
         <div class="update-version-grid">
-          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.15</div>
+          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.16</div>
           <div class="k">최신 버전</div><div class="v" id="updateLatestVersion">확인 전</div>
           <div class="k">마지막 업데이트</div><div class="v" id="updateReleasedAt">확인 전</div>
           <div class="k">제작</div><div class="v">부산백양고 신태규</div>
@@ -915,6 +915,7 @@
         <div class="update-notes" style="margin-top:10px">
           <strong>최근 업데이트 이력</strong>
           <ul>
+            <li><strong>v1.4.16</strong> · 스마트 경기 타임테이블 도움말 문구를 테스트 단계 안내 중심의 2줄 문구로 수정</li>
             <li><strong>v1.4.15</strong> · 종별 별도 진행에서도 결승 전 휴식·결승 코트 설정 제거</li>
             <li><strong>v1.4.14</strong> · 최소 휴식시간 입력 제거, 연속 경기 방지 ON 시 한 경기 시간 자동 간격 적용, 설정 입력부 오른쪽 정렬 개선</li>
             <li><strong>v1.4.13</strong> · 경기시간·코트 표시 기본 OFF, OFF 시 타임테이블 설정 영역을 회색 잠금 상태로 유지하고 도움말 문구 줄바꿈 적용</li>
@@ -982,7 +983,7 @@
     'use strict';
 
     const APP_VERSION = '4.0.0-SCHOOL';
-    const RELEASE_VERSION = '1.4.15';
+    const RELEASE_VERSION = '1.4.16';
     const UPDATE_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.json?ref=main';
     const LATEST_HTML_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main';
     const UPDATE_SCRIPT_URLS = [];
@@ -2578,7 +2579,7 @@
             <div class="schedule-title">⏱ 스마트 경기 타임테이블</div>
             <span class="schedule-help-wrap">
               <button type="button" class="schedule-help-btn" aria-label="타임테이블 사용 주의사항">?</button>
-              <span class="schedule-help-tooltip" role="tooltip">타임테이블은<br>참고용으로만 사용하시고<br>꼭 오류가 없는지 확인하시기 바랍니다.</span>
+              <span class="schedule-help-tooltip" role="tooltip">타임테이블 기능은 아직 테스트 단계입니다.<br>참고용으로만 사용하시고 오류가 없는지 꼭 확인하시기 바랍니다.</span>
             </span>
           </div>
           <button type="button" class="schedule-collapse-btn" id="scheduleCollapseBtn" aria-expanded="${schedule.panelCollapsed ? 'false' : 'true'}">${schedule.panelCollapsed ? '펼치기 ▼' : '접기 ▲'}</button>

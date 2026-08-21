@@ -1,10 +1,9 @@
 {
-  "version": "1.4.15",
+  "version": "1.4.16",
   "releasedAt": "2026-08-21",
   "notes": [
-    "종별 별도 진행에서도 결승 전 휴식 설정 제거",
-    "종별 별도 진행에서도 결승 코트 설정 제거",
-    "모든 진행 방식에서 결승도 일반 경기와 동일한 휴식 및 코트 배정 규칙 적용"
+    "스마트 경기 타임테이블 도움말 문구를 테스트 단계 안내 문구로 수정",
+    "도움말을 2줄로 표시"
   ],
   "downloadApiUrl": "https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main",
   "downloadUrl": "https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html"
