@@ -298,8 +298,17 @@
       box-shadow:0 1px 3px rgba(18,32,51,.08);
     }
     .schedule-group-settings { display:grid; gap:8px; margin-top:10px; }
-    .schedule-group-row { display:grid; grid-template-columns:minmax(120px,1.15fr) repeat(6,minmax(92px,.7fr)); gap:8px; align-items:end; padding:10px; background:#fff; border:1px solid #cbd6f2; border-radius:11px; }
-    .schedule-group-row > div:first-child { align-self:center; }
+    .schedule-group-row {
+      display:grid;
+      grid-template-columns:minmax(380px,1.8fr) repeat(3,minmax(140px,.62fr));
+      gap:14px;
+      align-items:end;
+      padding:10px;
+      background:#fff;
+      border:1px solid #cbd6f2;
+      border-radius:11px;
+    }
+    .schedule-group-row > div:first-child { align-self:center; min-width:0; }
     .schedule-group-title { font-size:12px; font-weight:950; }
     .schedule-group-members { margin-top:3px; color:var(--muted); font-size:10px; line-height:1.4; }
     .schedule-group-row .field { margin:0; }
@@ -315,7 +324,15 @@
     .toggle-switch input:checked + .toggle-slider { background:var(--primary); }
     .toggle-switch input:checked + .toggle-slider::before { transform:translateX(22px); }
     .toggle-state { min-width:28px; font-size:11px; font-weight:950; color:#4a5872; }
-    .toggle-help { flex:1 1 230px; font-size:10px; color:var(--muted); line-height:1.45; }
+    .toggle-help {
+      flex:1 0 100%;
+      margin-top:2px;
+      padding-right:4px;
+      font-size:10px;
+      color:var(--muted);
+      line-height:1.6;
+      word-break:keep-all;
+    }
     .timetable-modal-card { width:min(1180px,97vw); }
     .timetable-summary-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
     .timetable-summary-card { border:1px solid var(--line); border-radius:11px; padding:10px; background:#fbfcff; }
@@ -337,7 +354,15 @@
     .division-summary-table th { background:#f5f7fb; }
     @media (max-width:800px) { .timetable-summary-grid { grid-template-columns:1fr 1fr; } }
     .match-time { margin-left:8px; padding:2px 6px; border-radius:999px; background:#eef2ff; color:#3346b8; font-size:10px; font-weight:900; white-space:nowrap; }
-    @media (max-width:850px) { .schedule-grid-4 { grid-template-columns:1fr 1fr; } .schedule-division-row, .schedule-group-row { grid-template-columns:1fr 1fr; } .schedule-division-row > strong, .schedule-group-row > div:first-child { grid-column:1/-1; } .schedule-group-assignment-row { grid-template-columns:1fr 150px 110px; } }
+    @media (max-width:850px) {
+      .schedule-grid-4 { grid-template-columns:1fr 1fr; }
+      .schedule-division-row,
+      .schedule-group-row,
+      .schedule-group-row[data-group-id="combined"] { grid-template-columns:1fr 1fr; }
+      .schedule-division-row > strong,
+      .schedule-group-row > div:first-child { grid-column:1/-1; }
+      .schedule-group-assignment-row { grid-template-columns:1fr 150px 110px; }
+    }
 
     .match-time { display: inline-flex; margin-left: 6px; padding: 2px 6px; border-radius: 999px; background: #edf2ff; color: #244bb8; border: 1px solid #cbd7fb; font-size: 10px; font-weight: 950; vertical-align: middle; }
     @media (max-width: 650px) { .schedule-grid { grid-template-columns: 1fr 1fr; } .schedule-note { grid-column: 1 / -1; } }
@@ -672,7 +697,7 @@
         <p>종별과 팀 수를 자유롭게 설정하고, 참가팀 명단과 공개 추첨번호로 공정하게 대진을 추첨합니다.</p>
         <div class="local-data-note">※ 모든 데이터는 현재 사용 중인 PC의 브라우저에만 저장되며 다른 사용자와 공유되지 않습니다.</div>
         <div class="maker-credit">제작 <strong>부산백양고 신태규</strong></div>
-        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.13</span></div>
+        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.15</span></div>
       </div>
       <div class="hero-tools no-print">
         <button class="btn btn-soft" id="fullscreenBtn">전체화면</button>
@@ -878,7 +903,7 @@
       <div class="modal-body">
         <div class="update-status" id="updateStatus">최신 버전 정보를 확인하려면 아래 버튼을 눌러 주세요.</div>
         <div class="update-version-grid">
-          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.13</div>
+          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.15</div>
           <div class="k">최신 버전</div><div class="v" id="updateLatestVersion">확인 전</div>
           <div class="k">마지막 업데이트</div><div class="v" id="updateReleasedAt">확인 전</div>
           <div class="k">제작</div><div class="v">부산백양고 신태규</div>
@@ -890,6 +915,8 @@
         <div class="update-notes" style="margin-top:10px">
           <strong>최근 업데이트 이력</strong>
           <ul>
+            <li><strong>v1.4.15</strong> · 종별 별도 진행에서도 결승 전 휴식·결승 코트 설정 제거</li>
+            <li><strong>v1.4.14</strong> · 최소 휴식시간 입력 제거, 연속 경기 방지 ON 시 한 경기 시간 자동 간격 적용, 설정 입력부 오른쪽 정렬 개선</li>
             <li><strong>v1.4.13</strong> · 경기시간·코트 표시 기본 OFF, OFF 시 타임테이블 설정 영역을 회색 잠금 상태로 유지하고 도움말 문구 줄바꿈 적용</li>
             <li><strong>v1.4.12</strong> · 스마트 경기 타임테이블 기본 상태를 접힘으로 변경하고 제목 옆 도움말(?) 툴팁 추가</li>
             <li><strong>v1.4.11</strong> · 스마트 경기 타임테이블 영역에 작은 접기·펼치기 버튼 추가</li>
@@ -931,7 +958,7 @@
     <div class="modal-card timetable-modal-card">
       <div class="modal-head">
         <h2>스마트 경기 타임테이블</h2>
-        <p>대진 관계, 최소 휴식시간, 코트 수, 종별 우선순위를 함께 계산한 자동 편성 결과입니다.</p>
+        <p>대진 관계, 연속 경기 방지, 코트 수, 종별 우선순위를 함께 계산한 자동 편성 결과입니다.</p>
       </div>
       <div class="modal-body" id="timetableModalBody"></div>
       <div class="modal-actions">
@@ -955,7 +982,7 @@
     'use strict';
 
     const APP_VERSION = '4.0.0-SCHOOL';
-    const RELEASE_VERSION = '1.4.13';
+    const RELEASE_VERSION = '1.4.15';
     const UPDATE_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.json?ref=main';
     const LATEST_HTML_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main';
     const UPDATE_SCRIPT_URLS = [];
@@ -2107,9 +2134,10 @@
       const durationMinutes = Math.max(1, Math.min(240, parseInt(v.durationMinutes, 10) || 15));
       const courtCount = Math.max(1, Math.min(20, parseInt(v.courtCount, 10) || 1));
       const preventConsecutive = v.preventConsecutive !== false;
-      const minRestMinutes = Math.max(0, Math.min(240, Number.isFinite(Number(v.minRestMinutes)) ? parseInt(v.minRestMinutes, 10) : 0));
-      const finalRestMinutes = Math.max(0, Math.min(240, Number.isFinite(Number(v.finalRestMinutes)) ? parseInt(v.finalRestMinutes, 10) : 0));
-      const finalCourt = Math.max(1, Math.min(courtCount, parseInt(v.finalCourt, 10) || 1));
+      // 최소 휴식시간 입력은 제거했다. 연속 경기 방지가 ON이면 한 경기 시간만큼 자동 간격을 둔다.
+      const minRestMinutes = preventConsecutive ? durationMinutes : 0;
+      const finalRestMinutes = 0;
+      const finalCourt = 0;
       return { startTime, durationMinutes, courtCount, preventConsecutive, minRestMinutes, finalRestMinutes, finalCourt };
     }
 
@@ -2161,7 +2189,7 @@
 
     function effectiveRestMinutes(cfg, item) {
       if (!cfg.preventConsecutive) return 0;
-      return item.isFinal ? Math.max(cfg.minRestMinutes, cfg.finalRestMinutes) : cfg.minRestMinutes;
+      return cfg.minRestMinutes;
     }
 
     function earliestSlotForItem(item, scheduledInfo, cfg) {
@@ -2176,12 +2204,8 @@
       return earliest;
     }
 
-    function scheduleGroupSmart(divisions, setting, order, groupId, useFinalOptions=true) {
+    function scheduleGroupSmart(divisions, setting, order, groupId) {
       const cfg = cleanScheduleSetting(setting);
-      if (!useFinalOptions) {
-        cfg.finalRestMinutes = 0;
-        cfg.finalCourt = 0;
-      }
       const [h, m] = cfg.startTime.split(':').map(Number);
       const base = h * 60 + m;
       const orderIndex = new Map((order || []).map((id, i) => [id, i]));
@@ -2237,8 +2261,7 @@
 
         for (const item of assignOrder) {
           let court = null;
-          if (item.isFinal && cfg.finalCourt > 0 && freeCourts.has(cfg.finalCourt)) court = cfg.finalCourt;
-          else if (item.isSemi) {
+          if (item.isSemi) {
             court = [1,2].find(c => freeCourts.has(c)) || null;
           }
           if (!court) court = [...freeCourts][0];
@@ -2341,7 +2364,7 @@
       } else {
         const divisions = state.result.divisions;
         const order = divisions.map(d => d.divisionId);
-        const bundle = scheduleGroupSmart(divisions, schedule.combined, order, 'combined', false);
+        const bundle = scheduleGroupSmart(divisions, schedule.combined, order, 'combined');
         bundle.errors = validateGroupSchedule(bundle);
         groups.push(bundle);
         bundle.map.forEach((v,k) => allMap.set(k,v));
@@ -2488,7 +2511,7 @@
 
       const validation = errors.length
         ? `<div class="notice notice-warning"><strong>타임테이블 검증 오류 ${errors.length}건</strong><br>${errors.slice(0,12).map(e=>escapeHtml(e)).join('<br>')}${errors.length>12?'<br>…':''}</div>`
-        : `<div class="notice notice-success"><strong>✓ 타임테이블 검증 완료</strong><br>코트 중복, 선행경기, 최소 휴식, 부전승, 전체 경기 수 조건을 충족합니다.</div>`;
+        : `<div class="notice notice-success"><strong>✓ 타임테이블 검증 완료</strong><br>코트 중복, 선행경기, 연속 경기 간격, 부전승, 전체 경기 수 조건을 충족합니다.</div>`;
 
       return summary + validation + groupBlocks + divisionSummary;
     }
@@ -2522,14 +2545,10 @@
       const usedGroups = [...new Set(divisions.map(d => schedule.divisionGroups[d.divisionId]))]
         .sort((a,b) => Number((a.match(/\d+/)||[999])[0]) - Number((b.match(/\d+/)||[999])[0]));
 
-      const settingFields = (v, prefix='', includeFinalOptions=true) => `
+      const settingFields = (v, prefix='') => `
         <div class="field"><label>시작시간</label><input class="${prefix}start" type="time" value="${escapeHtml(v.startTime)}"></div>
         <div class="field"><label>소요시간(분)</label><input class="${prefix}duration" type="number" min="1" max="240" value="${v.durationMinutes}"></div>
-        <div class="field"><label>코트 수</label><input class="${prefix}courts" type="number" min="1" max="20" value="${v.courtCount}"></div>
-        <div class="field"><label>최소 휴식(분)</label><input class="${prefix}rest" type="number" min="0" max="240" value="${v.minRestMinutes}" ${v.preventConsecutive?'':'disabled'}></div>
-        ${includeFinalOptions ? `
-        <div class="field"><label>결승 전 휴식(분)</label><input class="${prefix}final-rest" type="number" min="0" max="240" value="${v.finalRestMinutes}" ${v.preventConsecutive?'':'disabled'}></div>
-        <div class="field"><label>결승 코트</label><input class="${prefix}final-court" type="number" min="1" max="${v.courtCount}" value="${v.finalCourt}"></div>` : ''}`;
+        <div class="field"><label>코트 수</label><input class="${prefix}courts" type="number" min="1" max="20" value="${v.courtCount}"></div>`;
 
       const groupRows = usedGroups.map(groupId => {
         const members = divisions.filter(d => schedule.divisionGroups[d.divisionId] === groupId);
@@ -2544,7 +2563,7 @@
                 <span class="toggle-slider"></span>
               </label>
               <span class="toggle-state">${v.preventConsecutive ? 'ON' : 'OFF'}</span>
-              <span class="toggle-help">ON: 최소 휴식시간 적용 · OFF: 별도 휴식시간 강제 안 함</span>
+              <span class="toggle-help">ON: 앞 경기가 끝난 뒤 한 경기 시간만큼 간격을 두고 다음 경기를 배정합니다. · OFF: 선행경기 종료 직후 다음 경기 배정이 가능합니다.</span>
             </div>
           </div>
           ${settingFields(v,'group-')}
@@ -2586,17 +2605,17 @@
                     <span class="toggle-slider"></span>
                   </label>
                   <span class="toggle-state" id="combinedPreventState">${combined.preventConsecutive ? 'ON' : 'OFF'}</span>
-                  <span class="toggle-help">ON: 앞 경기를 치른 팀이 설정한 최소 휴식시간을 확보한 뒤 다음 경기를 배정합니다. OFF: 선행경기 종료 후 별도 휴식시간을 강제하지 않습니다.</span>
+                  <span class="toggle-help">ON: 앞 경기가 끝난 뒤 한 경기 시간만큼 간격을 두고 다음 경기를 배정합니다. · OFF: 선행경기 종료 직후 다음 경기 배정이 가능합니다.</span>
                 </div>
               </div>
-              ${settingFields(combined,'combined-', false)}
+              ${settingFields(combined,'combined-')}
             </div>
           </div>
           <div id="separateScheduleBox" class="${mode==='separate'?'':'hidden'}">
             <div class="notice notice-success" style="margin:0 0 10px"><strong>집중 진행 방식</strong> · 높은 우선순위 종별의 가능한 경기를 먼저 배정하고, 휴식 때문에 생긴 빈 코트는 다음 순위 종별로 채웁니다.</div>
             <div class="schedule-note" style="padding:0 0 8px"><strong>① 종별 운영 그룹 · 우선순위 지정</strong> · 같은 그룹 안에서는 1순위 종별을 먼저 진행하지만, 코트를 비워두기 위해 다른 종별을 억지로 늦추지는 않습니다.</div>
             <div class="schedule-group-assignment">${assignmentRows}</div>
-            <div class="schedule-note" style="padding:2px 0 6px"><strong>② 그룹별 시간표 설정</strong> · 종별 별도 진행에서는 최소 휴식, 결승 전 휴식, 결승 코트를 그룹마다 다르게 지정할 수 있습니다.</div>
+            <div class="schedule-note" style="padding:2px 0 6px"><strong>② 그룹별 시간표 설정</strong> · 종별 별도 진행에서는 시작시간, 소요시간, 코트 수를 그룹마다 다르게 지정할 수 있습니다.</div>
             <div class="schedule-group-settings">${groupRows}</div>
           </div>
           <div class="schedule-actions">
@@ -2645,9 +2664,6 @@
         startTime: root.querySelector(`.${prefix}start`)?.value,
         durationMinutes: root.querySelector(`.${prefix}duration`)?.value,
         courtCount: root.querySelector(`.${prefix}courts`)?.value,
-        minRestMinutes: root.querySelector(`.${prefix}rest`)?.value,
-        finalRestMinutes: root.querySelector(`.${prefix}final-rest`)?.value,
-        finalCourt: root.querySelector(`.${prefix}final-court`)?.value,
         preventConsecutive: Boolean(preventEl?.checked)
       });
 

@@ -1,11 +1,10 @@
 {
-  "version": "1.4.13",
+  "version": "1.4.15",
   "releasedAt": "2026-08-21",
   "notes": [
-    "대진표에 경기시간·코트 표시 기본값을 체크 해제로 유지",
-    "체크 해제 시 타임테이블 설정 영역을 숨기지 않고 회색 비활성화 상태로 표시",
-    "스마트 경기 타임테이블 기본 접힘 상태 유지",
-    "도움말 문구를 3줄로 표시"
+    "종별 별도 진행에서도 결승 전 휴식 설정 제거",
+    "종별 별도 진행에서도 결승 코트 설정 제거",
+    "모든 진행 방식에서 결승도 일반 경기와 동일한 휴식 및 코트 배정 규칙 적용"
   ],
   "downloadApiUrl": "https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main",
   "downloadUrl": "https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html"
