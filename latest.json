@@ -1,0 +1,9 @@
+{
+  "version": "1.4.4",
+  "releasedAt": "2026-08-21",
+  "notes": [
+    "최신버전 확인 및 다운로드 서버를 GitHub 정적 저장소 방식으로 전환",
+    "대진표 기본 기능 및 스마트 타임테이블 기능 유지"
+  ],
+  "downloadUrl": "https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html"
+}
