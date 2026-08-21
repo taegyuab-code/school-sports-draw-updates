@@ -1,9 +1,10 @@
 {
-  "version": "1.4.16",
+  "version": "1.4.17",
   "releasedAt": "2026-08-21",
   "notes": [
-    "스마트 경기 타임테이블 도움말 문구를 테스트 단계 안내 문구로 수정",
-    "도움말을 2줄로 표시"
+    "공개 추첨번호 항목에 작은 도움말(?) 버튼 추가",
+    "공개추첨번호의 공정성·재현성 목적과 사전 공유 권장 문구 표시",
+    "기존의 동일 명단·동일 번호 결과 보장 문구는 제거"
   ],
   "downloadApiUrl": "https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main",
   "downloadUrl": "https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html"
