@@ -1,0 +1,3477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>교내 학교스포츠클럽 대진 추첨</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --line: #dce3ee;
+      --text: #172033;
+      --muted: #69758c;
+      --primary: #2457e6;
+      --primary-dark: #1942b7;
+      --soft: #edf2ff;
+      --success: #15835b;
+      --success-soft: #e9f8f2;
+      --danger: #c93d47;
+      --danger-soft: #fff0f1;
+      --warning: #9b6500;
+      --warning-soft: #fff7e5;
+      --shadow: 0 12px 34px rgba(29, 43, 73, .08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .48; transform: none !important; }
+    .hidden { display: none !important; }
+
+    .app { max-width: 1560px; margin: 0 auto; padding: 22px; }
+    .hero {
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 18px;
+      margin-bottom: 16px;
+    }
+    .hero h1 { margin: 0 0 7px; font-size: clamp(27px, 3.2vw, 42px); letter-spacing: -.045em; }
+    .hero p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .local-data-note { margin-top: 7px; color: #5f6b83; font-size: 11px; line-height: 1.5; }
+    .maker-credit {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 5px 9px;
+      border: 1px solid #d8e0ee; border-radius: 999px; background: rgba(255,255,255,.72);
+      color: #647087; font-size: 11px; font-weight: 800; letter-spacing: -.01em;
+    }
+    .maker-credit strong { color: #35415a; font-weight: 900; }
+    .hero-tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .btn {
+      border: 0; border-radius: 11px; padding: 10px 13px; font-weight: 850;
+      transition: transform .14s ease, background .14s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-soft { background: #eef2f8; color: #34415c; }
+    .btn-success { background: var(--success-soft); color: var(--success); border: 1px solid #c7eadb; }
+    .btn-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid #f1c9cd; }
+    .btn-warning { background: var(--warning-soft); color: var(--warning); border: 1px solid #f0dcad; }
+    .btn-full { width: 100%; }
+    .btn-lg { padding: 14px 16px; font-size: 16px; border-radius: 13px; }
+
+    .workflow {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 12px; margin-bottom: 16px;
+    }
+    .step {
+      border: 1px solid var(--line); background: #fafbfe; border-radius: 13px; padding: 11px 12px;
+      display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-weight: 850;
+    }
+    .step .num { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; background: #e9edf5; }
+    .step.active { color: var(--primary-dark); border-color: #a9baf4; background: var(--soft); }
+    .step.active .num { background: var(--primary); color: white; }
+    .step.done { color: var(--success); border-color: #b9dfd0; background: var(--success-soft); }
+    .step.done .num { background: var(--success); color: white; }
+
+    .layout { display: grid; grid-template-columns: 410px minmax(0, 1fr); gap: 16px; align-items: start; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .panel-head { padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { margin: 0; font-size: 18px; }
+    .panel-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .panel-body { padding: 16px 18px 18px; }
+
+    .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    label { font-size: 12px; font-weight: 850; color: #34415c; }
+    input, textarea, select {
+      width: 100%; border: 1px solid #ccd6e4; border-radius: 10px; background: white;
+      padding: 10px 11px; color: var(--text); outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(36,87,230,.12); }
+    input:disabled, textarea:disabled, select:disabled { background: #f2f4f8; color: #69758c; }
+    .help { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+    .event-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 9px; }
+    .division-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .division-card {
+      border: 1px solid var(--line); background: #fbfcff; border-radius: 12px; padding: 10px;
+      text-align: left; color: var(--text); position: relative;
+    }
+    .division-card:hover { border-color: #afbee9; }
+    .division-card.active { border-color: var(--primary); background: var(--soft); box-shadow: inset 0 0 0 1px var(--primary); }
+    .division-card .name { font-weight: 900; font-size: 15px; }
+    .division-card .meta { color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .division-card .check { position: absolute; right: 9px; top: 9px; color: var(--success); font-weight: 900; }
+
+    .division-setup-box {
+      margin-top: 12px; padding: 11px 12px; border: 1px solid #bfcdf2; border-radius: 13px;
+      background: #f5f8ff; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .division-setup-box strong { display: block; font-size: 13px; }
+    .division-setup-box span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .setup-list { display: grid; gap: 8px; }
+    .setup-row {
+      display: grid; grid-template-columns: minmax(0, 1fr) 100px 66px; gap: 8px; align-items: end;
+      padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: #fbfcff;
+    }
+    .setup-row .field { margin: 0; }
+    .setup-row .btn { height: 40px; }
+    .setup-help { margin-bottom: 12px; padding: 10px 11px; border-radius: 11px; background: #f0f4ff; border: 1px solid #cad6fb; color: #3150a8; font-size: 11px; line-height: 1.55; }
+    .setup-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .setup-total { color: var(--muted); font-size: 11px; font-weight: 800; }
+    @media (max-width: 650px) {
+      .division-setup-box { align-items: stretch; flex-direction: column; }
+      .setup-row { grid-template-columns: minmax(0,1fr) 86px; }
+      .setup-row .setup-delete { grid-column: 1 / -1; }
+    }
+
+    .lock-box { margin-top: 14px; padding: 12px; border-radius: 13px; border: 1px solid #cfd9f2; background: #f5f8ff; }
+    .lock-box h3 { margin: 0 0 7px; font-size: 13px; }
+    .lock-box p { margin: 0 0 10px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+
+    .hash-box {
+      margin-top: 10px; border: 1px dashed #aab8d2; border-radius: 10px; padding: 9px 10px;
+      background: #fbfcff; font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-wrap: anywhere; color: #45516a;
+    }
+
+    .workspace { min-height: 720px; }
+    .workspace-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 13px 15px; border-bottom: 1px solid var(--line); background: #fbfcff;
+    }
+    .workspace-toolbar .left, .workspace-toolbar .right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .workspace-title strong { display: block; font-size: 17px; }
+    .workspace-title span { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; }
+    .workspace-content { padding: 15px; }
+
+    .editor-top { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: end; margin-bottom: 10px; }
+    .inline-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+    .team-editor { border: 1px solid var(--line); border-radius: 13px; overflow: hidden; }
+    .team-head, .team-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 120px; gap: 8px; align-items: center; }
+    .team-head { background: #f3f6fb; padding: 9px 10px; color: #4f5b72; font-size: 11px; font-weight: 850; text-align: center; }
+    .team-list { max-height: 530px; overflow-y: auto; }
+    .team-row { padding: 6px 10px; border-top: 1px solid #edf1f6; }
+    .team-no { text-align: center; color: var(--muted); font-size: 11px; font-weight: 850; }
+    .team-name { padding: 8px 9px; }
+    .no-bye-label { display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; font-size: 11px; font-weight: 750; cursor: pointer; }
+    .no-bye-label input { width: auto; accent-color: var(--primary); }
+
+    .paste-box { margin: 10px 0; padding: 11px; border: 1px solid #ccd8f5; background: #f5f8ff; border-radius: 12px; }
+    .paste-box textarea { min-height: 130px; resize: vertical; }
+
+    .summary-cards { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 9px; margin-bottom: 12px; }
+    .summary-card { border: 1px solid var(--line); border-radius: 12px; padding: 11px; background: #fbfcff; }
+    .summary-card .label { color: var(--muted); font-size: 10px; font-weight: 800; }
+    .summary-card .value { font-size: 19px; font-weight: 950; margin-top: 4px; }
+
+    .notice { padding: 10px 11px; border-radius: 11px; margin: 10px 0; font-size: 11px; line-height: 1.55; }
+    .notice-info { color: #3150a8; background: #f0f4ff; border: 1px solid #cad6fb; }
+    .notice-warning { color: var(--warning); background: var(--warning-soft); border: 1px solid #efdcae; }
+    .notice-success { color: var(--success); background: var(--success-soft); border: 1px solid #bee2d3; }
+
+    .seed-section {
+      border: 1px solid #bdccef; background: #f4f7ff; border-radius: 14px; padding: 13px; margin-top: 14px;
+    }
+    .seed-section h3 { margin: 0 0 6px; font-size: 14px; }
+    .seed-section p { margin: 0 0 10px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .seed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .empty { min-height: 610px; display: grid; place-items: center; text-align: center; color: var(--muted); padding: 35px; }
+    .empty .icon { font-size: 56px; margin-bottom: 10px; }
+    .empty strong { color: var(--text); display: block; margin-bottom: 6px; }
+
+    .result-header {
+      display: flex; justify-content: space-between; gap: 12px; align-items: flex-start;
+      border: 1px solid #c6d3f3; background: #f4f7ff; border-radius: 14px; padding: 13px; margin-bottom: 13px;
+    }
+    .result-header h2 { margin: 0 0 5px; font-size: 20px; }
+    .result-header p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .final-badge { white-space: nowrap; padding: 8px 10px; border-radius: 999px; color: var(--success); background: var(--success-soft); border: 1px solid #bee2d3; font-weight: 900; font-size: 11px; }
+    .result-header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .result-print-btn { min-width: 138px; font-weight: 900; box-shadow: 0 8px 18px rgba(37,99,235,.14); }
+
+    .schedule-panel { margin: 0 0 13px; padding: 12px 13px; border: 1px solid #cbd6f2; border-radius: 14px; background: #f7f9ff; }
+    .schedule-title { font-size: 13px; font-weight: 950; margin-bottom: 8px; }
+    .schedule-grid { display: grid; grid-template-columns: 150px 150px minmax(0,1fr); gap: 9px; align-items: end; }
+    .schedule-grid .field { margin: 0; }
+    .schedule-note { color: var(--muted); font-size: 10px; line-height: 1.5; padding-bottom: 9px; }
+    .schedule-mode-row { display:flex; gap:16px; flex-wrap:wrap; margin: 0 0 10px; padding: 9px 10px; background:#fff; border:1px solid var(--line); border-radius:11px; }
+    .schedule-mode-row label { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:900; cursor:pointer; }
+    .schedule-mode-row input { width:auto; accent-color:var(--primary); }
+    .schedule-grid-4 { grid-template-columns: 150px 150px 120px minmax(0,1fr); }
+    .schedule-division-list { display:grid; gap:8px; }
+    .schedule-division-row { display:grid; grid-template-columns:minmax(110px,1fr) 135px 135px 100px; gap:8px; align-items:end; padding:10px; background:#fff; border:1px solid var(--line); border-radius:11px; }
+    .schedule-division-row > strong { align-self:center; font-size:12px; }
+    .schedule-division-row .field { margin:0; }
+    .schedule-group-assignment { display:grid; gap:8px; margin-bottom:10px; }
+    .schedule-group-assignment-row { display:grid; grid-template-columns:minmax(120px,1fr) 180px 120px; gap:8px; align-items:center; padding:9px 10px; background:#fff; border:1px solid var(--line); border-radius:11px; }
+    .schedule-group-assignment-row strong { font-size:12px; }
+    .division-group-select { font-weight:900; transition:background-color .15s ease, border-color .15s ease, color .15s ease; }
+    .schedule-group-settings { display:grid; gap:8px; margin-top:10px; }
+    .schedule-group-row { display:grid; grid-template-columns:minmax(120px,1.15fr) repeat(6,minmax(92px,.7fr)); gap:8px; align-items:end; padding:10px; background:#fff; border:1px solid #cbd6f2; border-radius:11px; }
+    .schedule-group-row > div:first-child { align-self:center; }
+    .schedule-group-title { font-size:12px; font-weight:950; }
+    .schedule-group-members { margin-top:3px; color:var(--muted); font-size:10px; line-height:1.4; }
+    .schedule-group-row .field { margin:0; }
+    .schedule-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+    .schedule-validation { margin-left:auto; font-size:11px; font-weight:900; }
+    .schedule-validation.ok { color:var(--success); }
+    .schedule-validation.bad { color:var(--danger); }
+    .toggle-wrap { display:flex; align-items:center; gap:8px; margin-top:7px; flex-wrap:wrap; }
+    .toggle-switch { position:relative; width:48px; height:26px; display:inline-block; flex:0 0 auto; }
+    .toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-slider { position:absolute; inset:0; background:#cfd6e3; border-radius:999px; transition:.18s; box-shadow:inset 0 0 0 1px rgba(0,0,0,.05); }
+    .toggle-slider::before { content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:white; border-radius:50%; transition:.18s; box-shadow:0 1px 4px rgba(0,0,0,.22); }
+    .toggle-switch input:checked + .toggle-slider { background:var(--primary); }
+    .toggle-switch input:checked + .toggle-slider::before { transform:translateX(22px); }
+    .toggle-state { min-width:28px; font-size:11px; font-weight:950; color:#4a5872; }
+    .toggle-help { flex:1 1 230px; font-size:10px; color:var(--muted); line-height:1.45; }
+    .timetable-modal-card { width:min(1180px,97vw); }
+    .timetable-summary-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+    .timetable-summary-card { border:1px solid var(--line); border-radius:11px; padding:10px; background:#fbfcff; }
+    .timetable-summary-card .k { color:var(--muted); font-size:10px; font-weight:800; }
+    .timetable-summary-card .v { margin-top:3px; font-size:16px; font-weight:950; }
+    .timetable-group-block { margin-top:16px; }
+    .timetable-group-head { display:flex; justify-content:space-between; gap:10px; align-items:end; margin-bottom:7px; }
+    .timetable-group-head h3 { margin:0; font-size:16px; }
+    .timetable-group-head span { color:var(--muted); font-size:10px; }
+    .timetable-table-wrap { overflow:auto; border:1px solid var(--line); border-radius:12px; }
+    .timetable-table { width:100%; border-collapse:collapse; min-width:720px; font-size:11px; }
+    .timetable-table th,.timetable-table td { border:1px solid #e3e8f1; padding:7px; vertical-align:top; text-align:center; }
+    .timetable-table th { background:#f3f6fb; color:#3e4a65; font-weight:900; position:sticky; top:0; }
+    .tt-match { line-height:1.45; font-weight:800; }
+    .tt-match .sub { display:block; margin-top:2px; color:var(--muted); font-size:9px; font-weight:700; }
+    .tt-final { background:#fff8e7; }
+    .division-summary-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:11px; }
+    .division-summary-table th,.division-summary-table td { border:1px solid var(--line); padding:7px; text-align:center; }
+    .division-summary-table th { background:#f5f7fb; }
+    @media (max-width:800px) { .timetable-summary-grid { grid-template-columns:1fr 1fr; } }
+    .match-time { margin-left:8px; padding:2px 6px; border-radius:999px; background:#eef2ff; color:#3346b8; font-size:10px; font-weight:900; white-space:nowrap; }
+    @media (max-width:850px) { .schedule-grid-4 { grid-template-columns:1fr 1fr; } .schedule-division-row, .schedule-group-row { grid-template-columns:1fr 1fr; } .schedule-division-row > strong, .schedule-group-row > div:first-child { grid-column:1/-1; } .schedule-group-assignment-row { grid-template-columns:1fr 150px 110px; } }
+
+    .match-time { display: inline-flex; margin-left: 6px; padding: 2px 6px; border-radius: 999px; background: #edf2ff; color: #244bb8; border: 1px solid #cbd7fb; font-size: 10px; font-weight: 950; vertical-align: middle; }
+    @media (max-width: 650px) { .schedule-grid { grid-template-columns: 1fr 1fr; } .schedule-note { grid-column: 1 / -1; } }
+
+    .result-tabs { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 8px; }
+    .result-tab { border: 1px solid var(--line); background: white; border-radius: 999px; padding: 8px 11px; font-weight: 850; white-space: nowrap; }
+    .result-tab.active { color: white; background: var(--primary); border-color: var(--primary); }
+
+    .bye-list { display: flex; gap: 7px; flex-wrap: wrap; margin: 8px 0 14px; }
+    .bye-chip { padding: 7px 9px; background: var(--success-soft); color: var(--success); border: 1px solid #c0e4d5; border-radius: 999px; font-size: 11px; font-weight: 850; }
+    .bye-chip.forced { background: var(--warning-soft); color: var(--warning); border-color: #ebd79e; }
+
+    .round-block { margin-top: 17px; }
+    .round-block h3 { margin: 0 0 8px; font-size: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .round-block h3 span { color: var(--muted); font-size: 10px; font-weight: 700; }
+    .match-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .match-card { border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: white; }
+    .match-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; margin-bottom: 7px; }
+    .match-teams { display: grid; grid-template-columns: minmax(0,1fr) 28px minmax(0,1fr); gap: 7px; align-items: center; }
+    .match-team { background: #f5f7fb; border-radius: 9px; padding: 9px 8px; min-height: 37px; display: grid; place-items: center; text-align: center; font-size: 12px; font-weight: 850; }
+    .match-vs { text-align: center; color: var(--muted); font-size: 10px; font-weight: 900; }
+    .match-card.bye-match { background: #fbfdfc; border-color: #c7e3d7; }
+    .match-card.bye-match .match-team:first-of-type { background: var(--success-soft); color: var(--success); }
+
+    .audit {
+      margin-top: 15px; border: 1px solid var(--line); border-radius: 13px; padding: 12px; background: #fbfcff;
+    }
+    .audit h3 { margin: 0 0 9px; font-size: 13px; }
+    .audit-grid { display: grid; grid-template-columns: 130px minmax(0,1fr); gap: 5px 10px; font-size: 11px; }
+    .audit-grid .k { color: var(--muted); }
+    .audit-grid .v { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
+
+    .division-result {
+      border: 1px solid var(--line); border-radius: 18px; background: #f4f4f4; padding: 16px; margin-top: 8px;
+      box-shadow: 0 8px 24px rgba(29, 43, 73, .05);
+    }
+    .division-banner {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+      padding: 14px 15px; border-radius: 16px; background: linear-gradient(135deg, #f4f7ff 0%, #fbfcff 100%); border: 1px solid #d5def5;
+      margin-bottom: 12px;
+    }
+    .division-banner h2 { margin: 0 0 6px; font-size: 24px; letter-spacing: -.03em; }
+    .division-banner p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .division-stamp {
+      flex: 0 0 auto; white-space: nowrap; padding: 8px 11px; border-radius: 999px; border: 1px solid #c0e4d5;
+      background: var(--success-soft); color: var(--success); font-size: 11px; font-weight: 900;
+    }
+
+    .tournament-board {
+      margin-top: 16px; display: grid; grid-template-columns: repeat(var(--round-cols), minmax(260px, 1fr));
+      gap: 38px; align-items: start; overflow-x: auto; padding: 0 2px 8px; position: relative; isolation: isolate;
+    }
+    .t-round {
+      position: relative; min-width: 250px; z-index: 2;
+    }
+    .bracket-connectors {
+      position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; overflow: visible;
+    }
+    .bracket-connector-line {
+      fill: none; stroke: #b8bec9; stroke-width: 2; stroke-linecap: square; stroke-linejoin: miter;
+      vector-effect: non-scaling-stroke;
+    }
+    .t-round-head {
+      background: #4748d5; color: white; text-align: center; font-size: 18px; font-weight: 900;
+      padding: 12px 10px; border-radius: 0; margin-bottom: 16px;
+    }
+    .t-round-stack {
+      display: flex; flex-direction: column; gap: 28px; padding-top: 0; position: relative;
+    }
+    .t-round.bracket-aligned .t-round-stack {
+      display: block;
+    }
+    .t-round.bracket-aligned .t-match-wrap {
+      position: absolute; left: 0; right: 0;
+    }
+    .t-match-wrap {
+      position: relative;
+    }
+    .t-match {
+      border: 2px solid #c7c7c7; background: #f8f8f8;
+    }
+    .t-match.bye-match {
+      background: #fbfbfb;
+    }
+    .t-match-label {
+      font-weight: 900; font-size: 12px; margin: 0 0 8px 2px; color: #111;
+    }
+    .t-row {
+      display: grid; grid-template-columns: minmax(0,1fr) 48px; align-items: stretch;
+      border-top: 1px solid #c5c5c5;
+      min-height: 52px; background: #e9edf3;
+    }
+    .t-row:first-child { border-top: 0; }
+    .t-row.bye-row {
+      background: #fff1b8;
+      box-shadow: inset 0 0 0 1px #e0bd45;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .t-row.bye-row .t-team-main {
+      justify-content: center; text-align: center;
+      background: #fff1b8;
+    }
+    .t-row.bye-row .t-score {
+      background: #ffe89a;
+    }
+    .t-team-main {
+      display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px;
+      padding: 10px 10px; text-align: center; min-width: 0;
+    }
+    .t-team-name { font-size: 13px; font-weight: 900; line-height: 1.28; word-break: keep-all; }
+    .t-team-sub { font-size: 10px; color: #475066; line-height: 1.2; }
+    .t-score {
+      border-left: 1px solid #c5c5c5; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 900; color: #1f2fd2; background: #f5f5f5;
+    }
+    .t-score.muted { color: #6d768d; }
+    .t-score.bye-tag { color: #111; }
+    .t-score.forced { color: #9b6500; }
+    .t-legend {
+      margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .t-legend-chip {
+      padding: 7px 10px; border-radius: 999px; border: 1px solid #d7deee; background: white; font-size: 11px; font-weight: 850;
+    }
+    .t-legend-chip.forced { background: var(--warning-soft); border-color: #ecd9a2; color: var(--warning); }
+    .t-legend-chip.normal { background: var(--success-soft); border-color: #c9e4d6; color: var(--success); }
+    .history-list { display: grid; gap: 10px; }
+    .history-empty { padding: 34px 16px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; }
+    .history-item {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center;
+      border: 1px solid var(--line); border-radius: 14px; padding: 12px 13px; background: #fbfcff;
+    }
+    .history-item:hover { border-color: #b7c5e8; background: #f7f9ff; }
+    .history-main { min-width: 0; }
+    .history-title { font-size: 14px; font-weight: 900; line-height: 1.35; }
+    .history-meta { margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .history-code { margin-top: 5px; font: 10px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #53617b; overflow-wrap: anywhere; }
+    .history-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .history-count { display: inline-flex; align-items: center; padding: 5px 8px; border-radius: 999px; background: var(--soft); color: var(--primary-dark); font-size: 10px; font-weight: 900; }
+    .history-modal-card { width: min(900px, 96vw); }
+    @media (max-width: 650px) {
+      .history-item { grid-template-columns: 1fr; }
+      .history-actions { justify-content: flex-start; }
+    }
+
+    .version-line {
+      margin-top: 7px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      color: var(--muted); font-size: 11px; font-weight: 800;
+    }
+    .version-badge {
+      display: inline-flex; align-items: center; padding: 4px 7px; border-radius: 999px;
+      background: #eef2f8; color: #44516b; border: 1px solid #d8dfeb;
+      font: 10px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .update-status {
+      padding: 13px 14px; border-radius: 13px; border: 1px solid var(--line); background: #fbfcff;
+      font-size: 12px; line-height: 1.65;
+    }
+    .update-status.success { background: var(--success-soft); color: var(--success); border-color: #bee2d3; }
+    .update-status.warning { background: var(--warning-soft); color: var(--warning); border-color: #efdcae; }
+    .update-status.error { background: var(--danger-soft); color: var(--danger); border-color: #f1c9cd; }
+    .update-version-grid {
+      display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 7px 10px; margin-top: 12px;
+      font-size: 12px;
+    }
+    .update-version-grid .k { color: var(--muted); font-weight: 800; }
+    .update-version-grid .v { font-weight: 900; }
+    .update-notes {
+      margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: #f5f7fb; border: 1px solid var(--line);
+    }
+    .update-notes strong { display: block; margin-bottom: 6px; font-size: 12px; }
+    .update-notes ul { margin: 0; padding-left: 18px; color: #4b5871; font-size: 11px; line-height: 1.7; }
+
+    .modal, .draw-overlay {
+      position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
+      background: rgba(12, 18, 34, .72); backdrop-filter: blur(5px); padding: 18px;
+    }
+    .modal-card { width: min(780px, 96vw); max-height: 90vh; overflow-y: auto; border-radius: 18px; background: white; box-shadow: 0 28px 80px rgba(0,0,0,.25); }
+    .modal-head { padding: 17px 18px 12px; border-bottom: 1px solid var(--line); }
+    .modal-head h2 { margin: 0; font-size: 20px; }
+    .modal-head p { margin: 6px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .modal-body { padding: 15px 18px; }
+    .modal-actions { padding: 12px 18px 17px; display: flex; justify-content: flex-end; gap: 8px; }
+    .confirm-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .confirm-table th, .confirm-table td { border-bottom: 1px solid var(--line); padding: 9px 7px; text-align: center; }
+    .confirm-table th { background: #f5f7fb; color: #4b5871; font-size: 11px; }
+    .confirm-check { margin-top: 13px; display: flex; gap: 8px; align-items: flex-start; font-size: 12px; font-weight: 800; line-height: 1.5; }
+    .confirm-check input { width: auto; margin-top: 3px; accent-color: var(--primary); }
+
+    .draw-stage { width: min(860px, 96vw); text-align: center; color: white; }
+    .draw-stage .eyebrow { font-size: 15px; font-weight: 850; letter-spacing: .08em; opacity: .8; }
+    .draw-stage .countdown { font-size: clamp(90px, 18vw, 180px); font-weight: 1000; line-height: 1; margin: 18px 0; }
+    .draw-stage .rolling { min-height: 92px; display: grid; place-items: center; border-radius: 18px; padding: 17px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.24); font-size: clamp(24px, 5vw, 46px); font-weight: 950; }
+    .draw-stage .seed { margin-top: 15px; font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; opacity: .82; }
+
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 120; background: #172033; color: white; padding: 11px 14px; border-radius: 11px; box-shadow: var(--shadow); font-size: 12px; font-weight: 800; }
+
+    @media (max-width: 1000px) {
+      .layout { grid-template-columns: 1fr; }
+      .workflow { grid-template-columns: 1fr 1fr; }
+      .workspace { min-height: auto; }
+    }
+    @media (max-width: 650px) {
+      .app { padding: 12px; }
+      .hero { align-items: flex-start; flex-direction: column; }
+      .hero-tools { justify-content: flex-start; }
+      .workflow { grid-template-columns: 1fr; }
+      .event-grid, .seed-grid, .editor-top { grid-template-columns: 1fr; }
+      .summary-cards { grid-template-columns: 1fr 1fr; }
+      .match-grid { grid-template-columns: 1fr; }
+      .team-head, .team-row { grid-template-columns: 34px minmax(0, 1fr) 100px; }
+      .workspace-toolbar { align-items: flex-start; flex-direction: column; }
+      .result-header { flex-direction: column; }
+    }
+
+    .print-fit-content { transform-origin: top left; }
+    .print-meta { display: none; }
+
+    .high-split-page .division-banner {
+      margin-bottom: 8px;
+    }
+    .high-split-page .split-page-note {
+      margin: 7px 0 9px;
+      padding: 8px 11px;
+      border: 1px solid #cfd7ed;
+      background: #f7f9ff;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #3e4a65;
+      text-align: center;
+    }
+    .high-split-page .split-final-note {
+      margin-top: 10px;
+      padding: 9px 12px;
+      border: 2px solid #4748d5;
+      background: #f3f3ff;
+      color: #3536b4;
+      font-size: 12px;
+      font-weight: 950;
+      text-align: center;
+    }
+
+    body.print-preparing .print-all {
+      display: block !important;
+      width: 1085px;
+      position: absolute;
+      left: -100000px;
+      top: 0;
+      visibility: hidden;
+    }
+    body.print-preparing .print-all .division-result {
+      width: 1085px;
+      padding: 8px;
+      margin: 0;
+    }
+    body.print-preparing .print-all .division-banner { padding: 6px 8px; margin-bottom: 5px; }
+    body.print-preparing .print-all .division-banner h2 { font-size: 15px; margin-bottom: 2px; }
+    body.print-preparing .print-all .division-banner p { font-size: 8px; line-height: 1.25; }
+    body.print-preparing .print-all .division-stamp { padding: 4px 6px; font-size: 7px; }
+    body.print-preparing .print-all .summary-cards { gap: 3px; margin-bottom: 4px; }
+    body.print-preparing .print-all .summary-card { padding: 4px 5px; }
+    body.print-preparing .print-all .summary-card .label { font-size: 6px; }
+    body.print-preparing .print-all .summary-card .value { font-size: 10px; margin-top: 1px; }
+    body.print-preparing .print-all .notice { padding: 4px 5px; margin: 3px 0; font-size: 7px; }
+    body.print-preparing .print-all .tournament-board { margin-top: 6px; gap: var(--print-board-gap, 10px); }
+    body.print-preparing .print-all .t-round { min-width: var(--print-round-width, 125px); }
+    body.print-preparing .print-all .t-round + .t-round { padding-left: var(--print-round-pad, 8px); }
+    body.print-preparing .print-all .t-round-head { font-size: var(--print-head-font, 11px); padding: var(--print-head-pad, 6px) 4px; margin-bottom: 5px; }
+    body.print-preparing .print-all .t-match-label { font-size: var(--print-label-font, 7px); margin: 0 0 2px 1px; }
+    body.print-preparing .print-all .match-time { font-size: 6px; padding: 1px 3px; margin-left: 2px; }
+    body.print-preparing .print-all .t-match { border-width: 1px; }
+    body.print-preparing .print-all .t-row { min-height: var(--print-row-height, 28px); grid-template-columns: minmax(0,1fr) var(--print-score-width, 28px); }
+    body.print-preparing .print-all .t-team-main { padding: var(--print-team-pad, 4px) 3px; gap: 1px; }
+    body.print-preparing .print-all .t-team-name { font-size: var(--print-team-font, 9px); line-height: 1.08; }
+    body.print-preparing .print-all .t-team-sub { font-size: var(--print-sub-font, 6px); line-height: 1.05; }
+    body.print-preparing .print-all .t-score { font-size: var(--print-score-font, 7px); }
+    body.print-preparing .print-all .t-legend { display: none; }
+    body.print-preparing .print-all .bracket-connector-line { stroke-width: 1; }
+
+    @media print {
+      @page { size: landscape; margin: 5mm; }
+      html, body { width: 100%; background: white; }
+      body { margin: 0; }
+      .app { max-width: none; padding: 0; }
+      .hero, .hero-tools, .workflow, .layout > aside, .workspace-toolbar, .result-tabs, .no-print, .result-header, .audit, #screenResult { display: none !important; }
+      .layout, .panel, .workspace, .workspace-content, .print-all { display: block !important; width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; }
+      .print-all { visibility: visible !important; position: static !important; }
+      .division-result {
+        width: 287mm; height: 200mm; overflow: hidden; position: relative;
+        break-before: page; break-after: page; page-break-before: always; page-break-after: always;
+        box-shadow: none; margin: 0; border: 0; padding: 0;
+      }
+      .division-result:first-child { break-before: auto; page-break-before: auto; }
+      .print-fit-content { transform-origin: top left; }
+      .division-banner { padding: 6px 8px; margin-bottom: 5px; border-radius: 6px; }
+      .division-banner h2 { font-size: 15px; margin-bottom: 2px; }
+      .division-banner p { font-size: 8px; line-height: 1.25; }
+      .division-stamp { padding: 4px 6px; font-size: 7px; }
+      .summary-cards { gap: 3px; margin-bottom: 4px; }
+      .summary-card { padding: 4px 5px; box-shadow: none; }
+      .summary-card .label { font-size: 6px; }
+      .summary-card .value { font-size: 10px; margin-top: 1px; }
+      .notice { padding: 4px 5px; margin: 3px 0; font-size: 7px; }
+      .tournament-board { margin-top: 6px; gap: var(--print-board-gap, 10px); overflow: visible; }
+      .t-round { min-width: var(--print-round-width, 125px); }
+      .t-round + .t-round { padding-left: var(--print-round-pad, 8px); }
+      .t-round-head { font-size: var(--print-head-font, 11px); padding: var(--print-head-pad, 6px) 4px; margin-bottom: 5px; }
+      .t-match-label { font-size: var(--print-label-font, 7px); margin: 0 0 2px 1px; }
+      .match-time { font-size: 6px; padding: 1px 3px; margin-left: 2px; }
+      .t-match { border-width: 1px; box-shadow: none; }
+      .t-row { min-height: var(--print-row-height, 28px); grid-template-columns: minmax(0,1fr) var(--print-score-width, 28px); }
+      .t-team-main { padding: var(--print-team-pad, 4px) 3px; gap: 1px; }
+      .t-team-name { font-size: var(--print-team-font, 9px); line-height: 1.08; }
+      .t-team-sub { font-size: var(--print-sub-font, 6px); line-height: 1.05; }
+      .t-score { font-size: var(--print-score-font, 7px); }
+      .t-legend { display: none; }
+      .bracket-connector-line { stroke-width: 1; }
+      .print-meta { display: block; margin-top: 3px; text-align: right; font-size: 6px; color: #666; }
+      .high-split-page .summary-cards { display: none; }
+      .high-split-page .split-page-note { font-size: 8px; margin: 4px 0 6px; padding: 5px 8px; }
+      .high-split-page .split-final-note { font-size: 9px; margin-top: 6px; padding: 6px 9px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div>
+        <h1>교내 학교스포츠클럽 대진 추첨</h1>
+        <p>종별과 팀 수를 자유롭게 설정하고, 참가팀 명단과 공개 추첨번호로 공정하게 대진을 추첨합니다.</p>
+        <div class="local-data-note">※ 모든 데이터는 현재 사용 중인 PC의 브라우저에만 저장되며 다른 사용자와 공유되지 않습니다.</div>
+        <div class="maker-credit">제작 <strong>부산백양고 신태규</strong></div>
+        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.5</span></div>
+      </div>
+      <div class="hero-tools no-print">
+        <button class="btn btn-soft" id="fullscreenBtn">전체화면</button>
+        <button class="btn btn-soft" id="guideBtn">사용법</button>
+        <button class="btn btn-soft" id="historyBtn">지난 대진 보기</button>
+        <button class="btn btn-soft" id="updateBtn">최신버전 확인</button>
+        <button class="btn btn-soft" id="inquiryBtn">오류 및 문의사항</button>
+        <button class="btn btn-soft" id="verifyBtn">추첨 증명서 검증</button>
+        <input id="verifyFile" type="file" accept="application/json,.json" class="hidden" />
+        <button class="btn btn-danger" id="resetBtn">새 대회 시작</button>
+      </div>
+    </header>
+
+    <section class="workflow no-print">
+      <div class="step active" id="step1"><span class="num">1</span><span>종별·팀 수 설정</span></div>
+      <div class="step" id="step2"><span class="num">2</span><span>참가팀 입력·명단 잠금</span></div>
+      <div class="step" id="step3"><span class="num">3</span><span>공개 추첨번호 입력</span></div>
+      <div class="step" id="step4"><span class="num">4</span><span>전체 종별 1회 추첨</span></div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel no-print">
+        <div class="panel-head">
+          <h2>대회 설정</h2>
+          <p>교내대회에 맞게 종별명과 참가팀 수를 자유롭게 설정할 수 있습니다.</p>
+        </div>
+        <div class="panel-body">
+          <div class="event-grid">
+            <div class="field">
+              <label for="eventName">대회명</label>
+              <input id="eventName" value="교내 학교스포츠클럽대회" />
+            </div>
+            <div class="field">
+              <label for="sportName">종목</label>
+              <input id="sportName" placeholder="예: 배드민턴" />
+            </div>
+          </div>
+
+          <div class="division-setup-box">
+            <div>
+              <strong>종별 · 팀 수 설정</strong>
+              <span id="divisionSetupSummary">종별과 참가팀 수를 먼저 설정하세요.</span>
+            </div>
+            <button class="btn btn-primary" id="divisionSetupBtn">① 설정하기</button>
+          </div>
+
+          <div class="division-list" id="divisionList"></div>
+
+          <div class="lock-box">
+            <h3>② 참가 명단 최종 확정</h3>
+            <p>각 종별 팀명과 ‘부전승 제외’를 확인한 뒤 잠급니다. 잠근 다음 공개번호를 받으므로 결과를 보고 명단을 바꿀 수 없습니다.</p>
+            <button class="btn btn-primary btn-full" id="lockBtn">② 명단 확정 및 잠금</button>
+            <button class="btn btn-warning btn-full hidden" style="margin-top:7px" id="unlockBtn">추첨 전 명단 수정</button>
+            <div class="hash-box hidden" id="rosterHashBox"></div>
+          </div>
+
+          <div class="seed-section">
+            <h3>③ 공개 추첨번호</h3>
+            <p>명단을 잠근 뒤 추첨에 사용할 4~12자리 공개번호를 입력하세요. 같은 명단과 같은 번호는 언제나 같은 결과를 만듭니다.</p>
+            <div class="seed-grid">
+              <div class="field">
+                <label for="publicNumber">공개 추첨번호</label>
+                <input id="publicNumber" inputmode="numeric" maxlength="12" placeholder="예: 260806" disabled />
+              </div>
+              <div class="field">
+                <label for="numberProvider">번호 출처 / 제시자</label>
+                <input id="numberProvider" maxlength="30" placeholder="예: 학생회 추첨 / 체육부장" disabled />
+              </div>
+            </div>
+            <button class="btn btn-primary btn-lg btn-full" id="drawBtn" disabled>④ 전체 종별 공개 추첨</button>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel workspace">
+        <div class="workspace-toolbar no-print">
+          <div class="left">
+            <div class="workspace-title">
+              <strong id="workspaceTitle">남초 참가팀</strong>
+              <span id="workspaceSubtitle">팀명을 입력하고 Enter를 누르면 다음 칸으로 이동합니다.</span>
+            </div>
+          </div>
+          <div class="right" id="resultTools">
+            <button class="btn btn-soft hidden" id="copyBtn">카톡용 결과 복사</button>
+            <button class="btn btn-soft hidden" id="csvBtn">CSV 저장</button>
+            <button class="btn btn-soft hidden" id="certificateBtn">추첨 증명서 저장</button>
+            <button class="btn btn-success hidden" id="xlsxBtn">엑셀 대진표 저장</button>
+          </div>
+        </div>
+        <div class="workspace-content" id="workspaceContent"></div>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="divisionSetupModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>종별 · 참가팀 수 설정</h2>
+        <p>교내대회 운영 방식에 맞게 종별을 추가하거나 삭제하고, 각 종별의 참가팀 수를 설정하세요.</p>
+      </div>
+      <div class="modal-body">
+        <div class="setup-help">예: 남자부 8팀, 여자부 6팀 / 1학년 5팀, 2학년 7팀 / 농구 남자부 12팀 등 원하는 방식으로 자유롭게 구성할 수 있습니다.</div>
+        <div class="setup-list" id="divisionSetupList"></div>
+        <div class="setup-footer">
+          <button class="btn btn-soft" id="addDivisionBtn">＋ 종별 추가</button>
+          <span class="setup-total" id="divisionSetupTotal"></span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-soft" id="cancelDivisionSetupBtn">취소</button>
+        <button class="btn btn-primary" id="applyDivisionSetupBtn">설정 적용</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="confirmModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>공개 추첨 최종 확인</h2>
+        <p>화면공유 상태에서 아래 숫자와 부전승 규칙을 모두 확인한 뒤 한 번만 추첨합니다.</p>
+      </div>
+      <div class="modal-body">
+        <table class="confirm-table">
+          <thead><tr><th>종별</th><th>참가팀</th><th>대진규모</th><th>부전승</th><th>부전승 제외</th><th>예외 가능</th></tr></thead>
+          <tbody id="confirmRows"></tbody>
+        </table>
+        <div class="notice notice-warning hidden" id="confirmWarning"></div>
+        <div class="audit" style="margin-top:12px">
+          <div class="audit-grid">
+            <div class="k">공개번호</div><div class="v" id="confirmNumber"></div>
+            <div class="k">번호 제시자</div><div class="v" id="confirmProvider"></div>
+            <div class="k">명단 검증코드</div><div class="v" id="confirmRosterHash"></div>
+          </div>
+        </div>
+        <label class="confirm-check"><input id="finalCheck" type="checkbox" /> 참가팀 명단, 부전승 수, 부전승 제외 설정과 공개번호를 모두 확인했습니다. 추첨 결과는 완료 즉시 자동 확정되며 다시 뽑지 않습니다.</label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-soft" id="cancelDrawBtn">취소</button>
+        <button class="btn btn-primary" id="startDrawBtn" disabled>3·2·1 공개 추첨 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="historyModal" role="dialog" aria-modal="true">
+    <div class="modal-card history-modal-card">
+      <div class="modal-head">
+        <h2>지난 대진 기록함</h2>
+        <p>추첨이 완료된 대진은 이 브라우저에 자동 저장됩니다. 새 대회를 시작해도 이 기록은 유지됩니다.</p>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+          <span class="history-count" id="historyCount">0개 기록</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-soft" id="backupHistoryBtn">전체 기록 백업</button>
+            <button class="btn btn-soft" id="restoreHistoryBtn">백업 불러오기</button>
+            <input id="historyBackupFile" type="file" accept="application/json,.json" class="hidden" />
+            <button class="btn btn-success" id="restoreExcelBtn">엑셀 대진표 복원</button>
+            <input id="historyExcelFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden" />
+            <button class="btn btn-danger" id="clearHistoryBtn">기록함 비우기</button>
+          </div>
+        </div>
+        <div class="notice notice-info" style="margin:0 0 10px">
+          예전에 이 프로그램에서 저장한 <strong>엑셀 대진표(.xlsx)</strong>만 남아 있어도 복원할 수 있습니다.
+          엑셀에 저장되지 않았던 정확한 추첨 시각·명단 검증코드·일부 부전승 제외 체크 상태는 <strong>엑셀 복원본</strong>으로 표시됩니다.
+        </div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-soft" id="closeHistoryBtn">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="guideModal" role="dialog" aria-modal="true">
+    <div class="modal-card" style="width:min(680px,96vw)">
+      <div class="modal-head">
+        <h2>프로그램 사용법</h2>
+        <p>처음 사용하는 선생님도 아래 순서대로 진행하면 바로 대진을 추첨할 수 있습니다.</p>
+      </div>
+      <div class="modal-body">
+        <div class="notice notice-info" style="font-size:13px;line-height:1.8">
+          <strong>① 종별·팀 수 설정</strong> → 대회에 필요한 종별과 참가팀 수를 정합니다.<br>
+          <strong>② 참가팀 입력 및 명단 잠금</strong> → 팀명을 입력하고 부전승 제외 여부를 확인한 뒤 명단을 확정합니다.<br>
+          <strong>③ 공개 추첨번호 입력</strong> → 추첨에 사용할 4~12자리 번호와 번호 출처를 입력합니다.<br>
+          <strong>④ 공개 추첨</strong> → 최종 확인 후 한 번만 추첨하며 결과는 즉시 확정됩니다.<br>
+          <strong>⑤ 결과 저장</strong> → 엑셀 대진표, CSV, 추첨 증명서를 필요한 형식으로 저장합니다.<br>
+          <strong>⑥ 지난 대진 관리</strong> → 기록함에서 과거 대진을 다시 열거나 전체 기록을 백업·복원할 수 있습니다.
+        </div>
+        <div class="notice notice-success">※ 입력한 자료와 지난 대진은 현재 PC의 브라우저에만 저장됩니다. 중요한 기록은 정기적으로 <strong>전체 기록 백업</strong>을 권장합니다.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="closeGuideBtn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="updateModal" role="dialog" aria-modal="true">
+    <div class="modal-card" style="width:min(620px,96vw)">
+      <div class="modal-head">
+        <h2>프로그램 최신버전 확인</h2>
+        <p>업데이트 확인에만 인터넷을 사용합니다. 인터넷이 연결되지 않아도 대진 추첨 기능은 그대로 사용할 수 있습니다.</p>
+      </div>
+      <div class="modal-body">
+        <div class="update-status" id="updateStatus">최신 버전 정보를 확인하려면 아래 버튼을 눌러 주세요.</div>
+        <div class="update-version-grid">
+          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.5</div>
+          <div class="k">최신 버전</div><div class="v" id="updateLatestVersion">확인 전</div>
+          <div class="k">마지막 업데이트</div><div class="v" id="updateReleasedAt">확인 전</div>
+          <div class="k">제작</div><div class="v">부산백양고 신태규</div>
+        </div>
+        <div class="update-notes hidden" id="updateNotesBox">
+          <strong>최신버전 업데이트 내용</strong>
+          <ul id="updateNotesList"></ul>
+        </div>
+        <div class="update-notes" style="margin-top:10px">
+          <strong>최근 업데이트 이력</strong>
+          <ul>
+            <li><strong>v1.4.5</strong> · 종별 별도 진행 시 그룹 선택 셀을 그룹별 파스텔 색상으로 구분</li>
+            <li><strong>v1.4.4</strong> · 최신버전 확인 및 다운로드 서버를 GitHub 정적 저장소 방식으로 전환</li>
+            <li><strong>v1.4.3</strong> · 최신버전 확인 서버 연결 구조 안정화 및 새 전용 API 적용</li>
+            <li><strong>v1.4.2</strong> · 초기 기본값을 경기시간·코트 표시 OFF, 최소 휴식 0분으로 변경</li>
+            <li><strong>v1.4.1</strong> · 연속 경기 방지 기능을 설명 포함 ON/OFF 토글 버튼으로 개선</li>
+            <li><strong>v1.4.0</strong> · Dependency 기반 스마트 타임테이블, 최소휴식·결승휴식·결승코트·검증·요약·시간표 보기 추가</li>
+            <li><strong>v1.3.9</strong> · 연속 경기 방지: 다음 라운드 진출팀에 최소 1경기 시간의 휴식 자동 확보</li>
+            <li><strong>v1.3.8</strong> · 우선 종별 집중 진행: 상위 종별은 결승까지 빠르게 진행하고 빈 코트는 다음 종별로 자동 채움</li>
+            <li><strong>v1.3.7</strong> · 같은 운영 그룹 안에서 종별 경기 진행 우선순위 지정 기능 추가</li>
+            <li><strong>v1.3.6</strong> · 종별 그룹 운영 기능 추가: 여러 종별을 묶거나 따로 시간표 편성</li>
+            <li><strong>v1.3.5</strong> · 엑셀 대진표에서 지난 대진 기록 복원 기능 추가</li>
+            <li><strong>v1.3.4</strong> · 경기시간·코트 표시 OFF 시 시간·코트 설정 영역 자동 숨김</li>
+            <li><strong>v1.3.2</strong> · 대진표 경기시간·코트 표시 ON/OFF 기능 추가</li>
+            <li><strong>v1.3.1</strong> · 부전승 셀 배경색 강조 표시 추가</li>
+            <li><strong>v1.3.0</strong> · 통합/종별 별도 진행 방식, 코트 수, 종별 시작시간·소요시간 자동 배정 추가</li>
+            <li><strong>v1.2.0</strong> · 경기 시작시간·경기 소요시간 입력 및 대진표 경기시간 자동 배정 추가</li>
+            <li><strong>v1.1.0</strong> · 전체 기록 백업/복원, 사용법 안내, 업데이트 이력 표시 추가</li>
+            <li><strong>v1.0.3</strong> · 최신버전 다운로드 버튼 표시 안정성 개선</li>
+            <li><strong>v1.0.2</strong> · ① 설정하기 / ② 명단 확정 및 잠금 단계 표시 개선</li>
+            <li><strong>v1.0.1</strong> · Replit 업데이트 서버 연결 및 오류·문의 접수 버튼 추가</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-soft" id="closeUpdateBtn">닫기</button>
+        <button class="btn btn-soft" id="checkUpdateBtn">다시 확인</button>
+        <button class="btn btn-primary hidden" id="downloadUpdateBtn">⬇ 최신버전 다운로드</button>
+      </div>
+    </div>
+  </div>\n\n  <div class="modal hidden" id="timetableModal" role="dialog" aria-modal="true">
+    <div class="modal-card timetable-modal-card">
+      <div class="modal-head">
+        <h2>스마트 경기 타임테이블</h2>
+        <p>대진 관계, 최소 휴식시간, 코트 수, 종별 우선순위를 함께 계산한 자동 편성 결과입니다.</p>
+      </div>
+      <div class="modal-body" id="timetableModalBody"></div>
+      <div class="modal-actions">
+        <button class="btn btn-soft" id="closeTimetableBtn">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="draw-overlay hidden" id="drawOverlay" role="dialog" aria-modal="true">
+    <div class="draw-stage">
+      <div class="eyebrow" id="drawEyebrow">공개 추첨을 시작합니다</div>
+      <div class="countdown" id="countdown">3</div>
+      <div class="rolling" id="rollingText">참가팀과 공개번호 확인 완료</div>
+      <div class="seed" id="overlaySeed"></div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script>
+    'use strict';
+
+    const APP_VERSION = '4.0.0-SCHOOL';
+    const RELEASE_VERSION = '1.4.5';
+    const UPDATE_API_URL = 'https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.json';
+    const UPDATE_SCRIPT_URLS = [];
+    const FALLBACK_DOWNLOAD_URL = 'https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html';
+    const STORAGE_KEY = 'schoolSportsClubDrawV1';
+    const HISTORY_KEY = 'schoolSportsClubDrawHistoryV1';
+    const HISTORY_LIMIT = 30;
+    const CREATOR = '부산백양고 신태규';
+    const DEFAULT_DIVISIONS = [
+      { id: 'division_1', name: '남자부', count: 4 },
+      { id: 'division_2', name: '여자부', count: 4 }
+    ];
+
+    const $ = id => document.getElementById(id);
+    let selectedDivisionId = DEFAULT_DIVISIONS[0].id;
+    let drawInProgress = false;
+    let divisionDraft = [];
+    let state = makeInitialState();
+
+    function makeInitialState() {
+      return {
+        appVersion: APP_VERSION,
+        eventName: '교내 학교스포츠클럽대회',
+        sportName: '',
+        divisions: DEFAULT_DIVISIONS.map(d => ({
+          id: d.id,
+          name: d.name,
+          teams: Array.from({ length: d.count }, (_, i) => ({ name: `${d.name} ${i + 1}팀`, noBye: false }))
+        })),
+        lock: { locked: false, lockedAt: '', rosterHash: '', snapshot: null },
+        publicNumber: '',
+        numberProvider: '',
+        schedule: { mode: 'combined', showDetails: false, combined: { startTime: '09:00', durationMinutes: 15, courtCount: 1, preventConsecutive: true, minRestMinutes: 0, finalRestMinutes: 0, finalCourt: 1 }, perDivision: {}, divisionGroups: {}, groupSettings: {}, groupOrder: {} },
+        result: null,
+        audit: null
+      };
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[ch]));
+    }
+
+    function cleanText(value) { return String(value ?? '').trim().replace(/\s+/g, ' '); }
+    function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+    function nowIso() { return new Date().toISOString(); }
+    function formatDateTime(iso) {
+      if (!iso) return '-';
+      return new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(iso));
+    }
+    function nextPowerOfTwo(n) { let p = 1; while (p < n) p *= 2; return p; }
+    function roundTitle(size, roundIndex) {
+      const teamsAtRound = size / (2 ** roundIndex);
+      if (teamsAtRound === 2) return '결승';
+      if (teamsAtRound === 4) return '준결승';
+      return `${teamsAtRound}강`;
+    }
+    function divisionById(id) { return state.divisions.find(d => d.id === id); }
+    function makeDivisionId() {
+      return `division_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+    }
+
+    function isAutoName(name, divisionName) { return new RegExp(`^${divisionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\d+팀$`).test(cleanText(name)); }
+
+    function canonicalSnapshot() {
+      return {
+        eventName: cleanText(state.eventName),
+        sportName: cleanText(state.sportName),
+        divisions: state.divisions.map(d => ({
+          id: d.id,
+          name: d.name,
+          teams: d.teams.map(t => ({ name: cleanText(t.name), noBye: Boolean(t.noBye) }))
+        }))
+      };
+    }
+
+    function stableStringify(value) {
+      if (Array.isArray(value)) return '[' + value.map(stableStringify).join(',') + ']';
+      if (value && typeof value === 'object') {
+        return '{' + Object.keys(value).sort().map(k => JSON.stringify(k) + ':' + stableStringify(value[k])).join(',') + '}';
+      }
+      return JSON.stringify(value);
+    }
+
+    async function sha256(text) {
+      if (window.crypto?.subtle) {
+        const bytes = new TextEncoder().encode(text);
+        const digest = await crypto.subtle.digest('SHA-256', bytes);
+        return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+      let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+      }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+      return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(16, '0').repeat(4).slice(0, 64);
+    }
+
+    function xmur3(str) {
+      let h = 1779033703 ^ str.length;
+      for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 3432918353), h = h << 13 | h >>> 19;
+      return function() {
+        h = Math.imul(h ^ (h >>> 16), 2246822507);
+        h = Math.imul(h ^ (h >>> 13), 3266489909);
+        return (h ^= h >>> 16) >>> 0;
+      };
+    }
+    function mulberry32(a) {
+      return function() {
+        let t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+    function seededRandom(seed) { return mulberry32(xmur3(seed)()); }
+    function shuffle(array, random) {
+      const result = [...array];
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    function spreadIndices(total, count) {
+      if (count <= 0) return [];
+      if (count >= total) return Array.from({ length: total }, (_, i) => i);
+      const indices = [];
+      for (let i = 0; i < count; i++) {
+        let idx = Math.floor((i + .5) * total / count);
+        while (indices.includes(idx)) idx = (idx + 1) % total;
+        indices.push(idx);
+      }
+      return indices.sort((a, b) => a - b);
+    }
+
+    function buildDivisionDraw(division, seed) {
+      const random = seededRandom(seed + '|' + division.id);
+      const teams = division.teams.map(t => ({ name: t.name, noBye: Boolean(t.noBye) }));
+      const n = teams.length;
+      const bracketSize = nextPowerOfTwo(n);
+      const byeCount = bracketSize - n;
+      const eligible = shuffle(teams.filter(t => !t.noBye), random);
+      const excluded = shuffle(teams.filter(t => t.noBye), random);
+      const forcedCount = Math.max(0, byeCount - eligible.length);
+      const byeTeams = [...eligible.slice(0, byeCount), ...excluded.slice(0, forcedCount)];
+      const forcedNames = new Set(excluded.slice(0, forcedCount).map(t => t.name));
+      const byeNames = new Set(byeTeams.map(t => t.name));
+      const playTeams = shuffle(teams.filter(t => !byeNames.has(t.name)), random);
+      const shuffledByes = shuffle(byeTeams, random);
+      const firstMatchCount = bracketSize / 2;
+      const byePositions = new Set(spreadIndices(firstMatchCount, byeCount));
+      const firstRound = [];
+      let b = 0, p = 0;
+
+      for (let i = 0; i < firstMatchCount; i++) {
+        const matchNo = i + 1;
+        if (byePositions.has(i)) {
+          const team = shuffledByes[b++];
+          const placeLeft = random() < .5;
+          firstRound.push({
+            id: `R1-M${matchNo}`,
+            round: 1,
+            matchNo,
+            a: placeLeft ? team.name : '부전승',
+            b: placeLeft ? '부전승' : team.name,
+            byeTeam: team.name,
+            forcedBye: forcedNames.has(team.name)
+          });
+        } else {
+          const a = playTeams[p++];
+          const c = playTeams[p++];
+          firstRound.push({ id: `R1-M${matchNo}`, round: 1, matchNo, a: a.name, b: c.name, byeTeam: '', forcedBye: false });
+        }
+      }
+
+      const rounds = [firstRound];
+      let previous = firstRound;
+      let round = 2;
+      while (previous.length > 1) {
+        const current = [];
+        for (let i = 0; i < previous.length; i += 2) {
+          const left = previous[i];
+          const right = previous[i + 1];
+          const sourceLabel = m => m.byeTeam || `${m.id} 승자`;
+          current.push({
+            id: `R${round}-M${i / 2 + 1}`,
+            round,
+            matchNo: i / 2 + 1,
+            a: sourceLabel(left),
+            b: sourceLabel(right),
+            byeTeam: '',
+            forcedBye: false
+          });
+        }
+        rounds.push(current);
+        previous = current;
+        round++;
+      }
+
+      return {
+        divisionId: division.id,
+        divisionName: division.name,
+        teamCount: n,
+        bracketSize,
+        byeCount,
+        excludedCount: teams.filter(t => t.noBye).length,
+        forcedByeCount: forcedCount,
+        byeTeams: shuffledByes.map(t => ({ name: t.name, forced: forcedNames.has(t.name) })),
+        rounds
+      };
+    }
+
+    async function createAllDraws(snapshot, publicNumber) {
+      const seedMaterial = stableStringify(snapshot) + '|PUBLIC:' + publicNumber + '|ALGO:' + APP_VERSION;
+      const masterHash = await sha256(seedMaterial);
+      const divisions = snapshot.divisions.map(d => buildDivisionDraw(d, masterHash));
+      const resultCore = { algorithm: APP_VERSION, masterHash, divisions };
+      const resultHash = await sha256(stableStringify(resultCore));
+      return { ...resultCore, resultHash };
+    }
+
+    function validateAll() {
+      const errors = [];
+      if (!state.divisions.length) errors.push('종별을 1개 이상 설정해 주세요.');
+      if (!cleanText(state.eventName)) errors.push('대회명을 입력해 주세요.');
+      state.divisions.forEach(d => {
+        if (d.teams.length < 2) errors.push(`${d.name}: 참가팀은 2팀 이상이어야 합니다.`);
+        if (d.teams.length > 128) errors.push(`${d.name}: 참가팀은 128팀 이하로 입력해 주세요.`);
+        const names = d.teams.map(t => cleanText(t.name));
+        if (names.some(n => !n)) errors.push(`${d.name}: 빈 팀명이 있습니다.`);
+        const duplicates = names.filter((n, i) => names.indexOf(n) !== i);
+        if (duplicates.length) errors.push(`${d.name}: 중복 팀명(${[...new Set(duplicates)].join(', ')})이 있습니다.`);
+      });
+      return errors;
+    }
+
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        const items = raw ? JSON.parse(raw) : [];
+        return Array.isArray(items) ? items : [];
+      } catch (e) {
+        console.warn(e);
+        return [];
+      }
+    }
+
+    function writeHistory(items) {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, HISTORY_LIMIT)));
+        return true;
+      } catch (e) {
+        console.warn(e);
+        // 저장 공간 부족 시 오래된 기록을 줄여 한 번 더 시도합니다.
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 10)));
+          return true;
+        } catch (e2) {
+          console.warn(e2);
+          return false;
+        }
+      }
+    }
+
+    function archiveCurrentDraw() {
+      if (!state?.result || !state?.audit?.drawId) return false;
+      const history = loadHistory();
+      const totalTeams = (state.result.divisions || []).reduce((sum, d) => sum + (d.teamCount || 0), 0);
+      const entry = {
+        id: state.audit.drawId,
+        savedAt: nowIso(),
+        eventName: cleanText(state.eventName) || '이름 없는 대회',
+        sportName: cleanText(state.sportName),
+        drawnAt: state.audit.drawnAt || '',
+        publicNumber: state.audit.publicNumber || '',
+        totalTeams,
+        state: JSON.parse(JSON.stringify(state))
+      };
+      const next = [entry, ...history.filter(h => h?.id !== entry.id)];
+      return writeHistory(next);
+    }
+
+    function renderHistoryList() {
+      const history = loadHistory();
+      $('historyCount').textContent = `${history.length}개 기록`;
+      $('clearHistoryBtn').disabled = history.length === 0;
+      if (!history.length) {
+        $('historyList').innerHTML = `<div class="history-empty"><strong style="display:block;color:var(--text);margin-bottom:6px">저장된 대진이 없습니다.</strong>앞으로 공개 추첨이 완료되면 자동으로 이곳에 보관됩니다.</div>`;
+        return;
+      }
+      $('historyList').innerHTML = history.map((h, i) => {
+        const title = `${escapeHtml(h.eventName || '이름 없는 대회')}${h.sportName ? ` · ${escapeHtml(h.sportName)}` : ''}`;
+        return `<article class="history-item" data-history-index="${i}">
+          <div class="history-main">
+            <div class="history-title">${title}</div>
+            <div class="history-meta">추첨: ${escapeHtml(formatDateTime(h.drawnAt))} · ${Number(h.totalTeams || 0)}팀 · 공개번호 ${escapeHtml(h.publicNumber || '-')}${h.state?.audit?.restoredFromExcel ? ' · <strong>엑셀 복원본</strong>' : ''}</div>
+            <div class="history-code">${escapeHtml(h.id || '')}</div>
+          </div>
+          <div class="history-actions">
+            <button class="btn btn-primary history-open" data-history-id="${escapeHtml(h.id)}">대진 열기</button>
+            <button class="btn btn-danger history-delete" data-history-id="${escapeHtml(h.id)}">삭제</button>
+          </div>
+        </article>`;
+      }).join('');
+
+      document.querySelectorAll('.history-open').forEach(btn => btn.addEventListener('click', () => restoreHistory(btn.dataset.historyId)));
+      document.querySelectorAll('.history-delete').forEach(btn => btn.addEventListener('click', () => deleteHistory(btn.dataset.historyId)));
+    }
+
+    function backupHistory() {
+      const history = loadHistory();
+      if (!history.length) return alert('백업할 지난 대진 기록이 없습니다.');
+      const payload = {
+        type: 'school-sports-club-draw-history-backup',
+        backupVersion: 1,
+        appRelease: RELEASE_VERSION,
+        creator: CREATOR,
+        exportedAt: nowIso(),
+        records: history
+      };
+      const fileName = `학교스포츠클럽_대진기록_백업_${new Date().toISOString().slice(0,10).replaceAll('-','')}.json`;
+      downloadBlob(JSON.stringify(payload, null, 2), fileName, 'application/json;charset=utf-8');
+      toast(`${history.length}개 대진 기록을 백업했습니다.`);
+    }
+
+    async function restoreHistoryBackup(file) {
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (parsed?.type !== 'school-sports-club-draw-history-backup' || !Array.isArray(parsed.records)) {
+          throw new Error('이 프로그램에서 만든 대진 기록 백업 파일이 아닙니다.');
+        }
+        const incoming = parsed.records.filter(r => r && r.id && r.state);
+        if (!incoming.length) throw new Error('복원할 대진 기록이 없습니다.');
+        const current = loadHistory();
+        const map = new Map(current.map(r => [r.id, r]));
+        incoming.forEach(r => map.set(r.id, r));
+        const merged = [...map.values()].sort((a,b) => String(b.drawnAt || b.savedAt || '').localeCompare(String(a.drawnAt || a.savedAt || ''))).slice(0, HISTORY_LIMIT);
+        if (!writeHistory(merged)) throw new Error('브라우저 저장공간에 기록을 저장할 수 없습니다.');
+        renderHistoryList();
+        toast(`${incoming.length}개 기록을 불러왔습니다. 현재 기록과 중복되는 항목은 최신 백업본으로 갱신했습니다.`);
+      } catch (err) {
+        alert(`백업 파일을 불러오지 못했습니다.\n\n${err.message || err}`);
+      }
+    }
+
+
+    function readLe16(view, offset) { return view.getUint16(offset, true); }
+    function readLe32(view, offset) { return view.getUint32(offset, true); }
+
+    async function unzipXlsxEntries(arrayBuffer) {
+      const bytes = new Uint8Array(arrayBuffer);
+      const view = new DataView(arrayBuffer);
+      let eocd = -1;
+      for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 65557); i--) {
+        if (readLe32(view, i) === 0x06054b50) { eocd = i; break; }
+      }
+      if (eocd < 0) throw new Error('올바른 XLSX 파일 구조를 찾지 못했습니다.');
+      const total = readLe16(view, eocd + 10);
+      let pos = readLe32(view, eocd + 16);
+      const decoder = new TextDecoder('utf-8');
+      const entries = new Map();
+
+      for (let i = 0; i < total; i++) {
+        if (readLe32(view, pos) !== 0x02014b50) throw new Error('엑셀 ZIP 목록을 읽는 중 오류가 발생했습니다.');
+        const method = readLe16(view, pos + 10);
+        const compressedSize = readLe32(view, pos + 20);
+        const nameLen = readLe16(view, pos + 28);
+        const extraLen = readLe16(view, pos + 30);
+        const commentLen = readLe16(view, pos + 32);
+        const localOffset = readLe32(view, pos + 42);
+        const name = decoder.decode(bytes.slice(pos + 46, pos + 46 + nameLen));
+
+        if (readLe32(view, localOffset) !== 0x04034b50) throw new Error('엑셀 ZIP 데이터 위치를 확인할 수 없습니다.');
+        const localNameLen = readLe16(view, localOffset + 26);
+        const localExtraLen = readLe16(view, localOffset + 28);
+        const dataStart = localOffset + 30 + localNameLen + localExtraLen;
+        const raw = bytes.slice(dataStart, dataStart + compressedSize);
+
+        let data;
+        if (method === 0) {
+          data = raw;
+        } else if (method === 8 && typeof DecompressionStream !== 'undefined') {
+          try {
+            const stream = new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+            data = new Uint8Array(await new Response(stream).arrayBuffer());
+          } catch (_) {
+            throw new Error('압축된 엑셀 파일을 해제하지 못했습니다. 가능하면 이 프로그램에서 저장한 원본 XLSX를 사용해 주세요.');
+          }
+        } else {
+          throw new Error('지원하지 않는 XLSX 압축 형식입니다. 이 프로그램에서 저장한 대진표 파일을 사용해 주세요.');
+        }
+        entries.set(name.replace(/^\/+/, ''), data);
+        pos += 46 + nameLen + extraLen + commentLen;
+      }
+      return entries;
+    }
+
+    function xmlText(bytes) {
+      return new TextDecoder('utf-8').decode(bytes || new Uint8Array());
+    }
+
+    function decodeXmlEntities(value) {
+      return String(value ?? '')
+        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'").replace(/&amp;/g, '&')
+        .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+        .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));
+    }
+
+    function parseSharedStrings(xml) {
+      const out = [];
+      const siRegex = /<si\b[^>]*>([\s\S]*?)<\/si>/g;
+      let m;
+      while ((m = siRegex.exec(xml))) {
+        const pieces = [];
+        const tRegex = /<t\b[^>]*>([\s\S]*?)<\/t>/g;
+        let t;
+        while ((t = tRegex.exec(m[1]))) pieces.push(decodeXmlEntities(t[1]));
+        out.push(pieces.join(''));
+      }
+      return out;
+    }
+
+    function parseWorksheetCells(xml, sharedStrings) {
+      const cells = new Map();
+      const cellRegex = /<c\b([^>]*)>([\s\S]*?)<\/c>/g;
+      let m;
+      while ((m = cellRegex.exec(xml))) {
+        const attrs = m[1], body = m[2];
+        const ref = (attrs.match(/\br="([^"]+)"/) || [])[1];
+        if (!ref) continue;
+        const type = (attrs.match(/\bt="([^"]+)"/) || [])[1] || '';
+        let value = '';
+        if (type === 'inlineStr') {
+          const ts = [...body.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map(x => decodeXmlEntities(x[1]));
+          value = ts.join('');
+        } else {
+          const vm = body.match(/<v\b[^>]*>([\s\S]*?)<\/v>/);
+          value = vm ? decodeXmlEntities(vm[1]) : '';
+          if (type === 's') value = sharedStrings[Number(value)] ?? '';
+        }
+        cells.set(ref.toUpperCase(), value);
+      }
+      return cells;
+    }
+
+    function excelRef(row, col) {
+      return `${excelCol(col)}${row}`;
+    }
+
+    function parseWorkbookSheets(workbookXml, relsXml) {
+      const relMap = new Map();
+      for (const m of relsXml.matchAll(/<Relationship\b([^>]*)\/?>/g)) {
+        const a = m[1];
+        const id = (a.match(/\bId="([^"]+)"/) || [])[1];
+        const target = (a.match(/\bTarget="([^"]+)"/) || [])[1];
+        if (id && target) relMap.set(id, target);
+      }
+      const sheets = [];
+      for (const m of workbookXml.matchAll(/<sheet\b([^>]*)\/?>/g)) {
+        const a = m[1];
+        const name = decodeXmlEntities((a.match(/\bname="([^"]+)"/) || [])[1] || '');
+        const rid = (a.match(/\br:id="([^"]+)"/) || [])[1];
+        let target = relMap.get(rid) || '';
+        target = target.replace(/^\/+/, '');
+        if (!target.startsWith('xl/')) target = `xl/${target}`;
+        sheets.push({ name, target });
+      }
+      return sheets;
+    }
+
+    function parseHeaderInfo(title, divisionName) {
+      let base = cleanText(title).replace(new RegExp(`\\s*·\\s*${divisionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*대진표\\s*$`), '');
+      if (base === title) base = cleanText(title).replace(/\s*대진표\s*$/, '');
+      const parts = base.split(/\s*·\s*/).filter(Boolean);
+      if (parts.length >= 2) return { eventName: parts.slice(0, -1).join(' · '), sportName: parts.at(-1) };
+      return { eventName: base || '엑셀 복원 대회', sportName: '' };
+    }
+
+    function parseBracketMeta(meta) {
+      const s = String(meta || '');
+      const teamCount = Number((s.match(/참가\s*(\d+)팀/) || [])[1] || 0);
+      const bracketSize = Number((s.match(/(\d+)강형/) || [])[1] || 0);
+      const byeCount = Number((s.match(/부전승\s*(\d+)팀/) || [])[1] || 0);
+      const drawId = cleanText((s.match(/추첨번호\s*([^·]+)/) || [])[1] || '');
+      return { teamCount, bracketSize, byeCount, drawId };
+    }
+
+    function parseAuditLine(line) {
+      const s = String(line || '');
+      return {
+        publicNumber: cleanText((s.match(/공개번호\s*([^·]+)/) || [])[1] || ''),
+        numberProvider: cleanText((s.match(/번호 제시자\s*([^·]+)/) || [])[1] || ''),
+        resultHash: cleanText((s.match(/결과 검증코드\s*([^·]+)/) || [])[1] || '')
+      };
+    }
+
+    async function importHistoryFromExcel(file) {
+      try {
+        const entries = await unzipXlsxEntries(await file.arrayBuffer());
+        const workbookXml = xmlText(entries.get('xl/workbook.xml'));
+        const relsXml = xmlText(entries.get('xl/_rels/workbook.xml.rels'));
+        if (!workbookXml || !relsXml) throw new Error('대진표 시트 정보를 찾지 못했습니다.');
+        const shared = entries.has('xl/sharedStrings.xml') ? parseSharedStrings(xmlText(entries.get('xl/sharedStrings.xml'))) : [];
+        const sheetDefs = parseWorkbookSheets(workbookXml, relsXml);
+        if (!sheetDefs.length) throw new Error('복원할 종별 시트가 없습니다.');
+
+        let eventName = '', sportName = '', importedDrawId = '', publicNumber = '', numberProvider = '', resultHash = '';
+        const resultDivisions = [];
+        const stateDivisions = [];
+
+        for (let si = 0; si < sheetDefs.length; si++) {
+          const sh = sheetDefs[si];
+          const xml = xmlText(entries.get(sh.target));
+          if (!xml) continue;
+          const cells = parseWorksheetCells(xml, shared);
+          const title = cells.get('A1') || '';
+          const meta = parseBracketMeta(cells.get('A2') || '');
+          if (!meta.teamCount || !meta.bracketSize) continue;
+
+          const header = parseHeaderInfo(title, sh.name);
+          if (!eventName) { eventName = header.eventName; sportName = header.sportName; }
+          if (!importedDrawId && meta.drawId) importedDrawId = meta.drawId;
+
+          const roundsCount = Math.round(Math.log2(meta.bracketSize));
+          const rounds = [];
+          const byeTeams = [];
+          const forcedNames = new Set();
+          const teamNames = [];
+          const baseRow = 6, roundSpan = 5;
+
+          for (let ri = 0; ri < roundsCount; ri++) {
+            const count = meta.bracketSize / (2 ** (ri + 1));
+            const sc = 1 + ri * roundSpan;
+            const step = 4 * (2 ** ri), offset = (2 ** (ri + 1)) - 2;
+            const round = [];
+            for (let mi = 0; mi < count; mi++) {
+              const top = baseRow + offset + mi * step;
+              const a = cleanText(cells.get(excelRef(top, sc)) || '');
+              const b = cleanText(cells.get(excelRef(top + 1, sc)) || '');
+              const statusA = cleanText(cells.get(excelRef(top, sc + 2)) || '');
+              const statusB = cleanText(cells.get(excelRef(top + 1, sc + 2)) || '');
+              const byeTeam = a === '부전승' ? b : (b === '부전승' ? a : '');
+              const forcedBye = /예외\s*부전승/.test(`${statusA} ${statusB}`);
+              if (byeTeam) {
+                byeTeams.push({ name: byeTeam, forced: forcedBye });
+                if (forcedBye) forcedNames.add(byeTeam);
+              }
+              [a, b].forEach(t => {
+                if (t && t !== '부전승' && !/^R\d+-M\d+\s*승자$/.test(t) && !teamNames.includes(t)) teamNames.push(t);
+              });
+              round.push({ id: `R${ri + 1}-M${mi + 1}`, a, b, byeTeam, forcedBye });
+            }
+            rounds.push(round);
+          }
+
+          // 실제 참가팀은 첫 라운드에 모두 나타나는 이 프로그램의 XLSX 구조를 기준으로 복원합니다.
+          const divisionId = `division_excel_${si + 1}_${Date.now().toString(36)}`;
+          const firstRoundNames = [];
+          (rounds[0] || []).forEach(m => [m.a, m.b].forEach(t => {
+            if (t && t !== '부전승' && !firstRoundNames.includes(t)) firstRoundNames.push(t);
+          }));
+          const actualTeams = firstRoundNames.length ? firstRoundNames : teamNames;
+
+          resultDivisions.push({
+            divisionId,
+            divisionName: sh.name || `종별 ${si + 1}`,
+            teamCount: meta.teamCount,
+            bracketSize: meta.bracketSize,
+            byeCount: meta.byeCount,
+            excludedCount: forcedNames.size,
+            forcedByeCount: forcedNames.size,
+            byeTeams,
+            rounds
+          });
+          stateDivisions.push({
+            id: divisionId,
+            name: sh.name || `종별 ${si + 1}`,
+            teams: actualTeams.map(name => ({ name, noBye: forcedNames.has(name) }))
+          });
+
+          const maxRow = Math.max(...[...cells.keys()].map(ref => Number((ref.match(/\d+/) || [0])[0])));
+          const audit = parseAuditLine(cells.get(`A${maxRow}`) || '');
+          if (!publicNumber && audit.publicNumber) publicNumber = audit.publicNumber;
+          if (!numberProvider && audit.numberProvider && audit.numberProvider !== '미입력') numberProvider = audit.numberProvider;
+          if (!resultHash && audit.resultHash) resultHash = audit.resultHash;
+        }
+
+        if (!resultDivisions.length) throw new Error('이 파일에서 프로그램 대진표 형식을 찾지 못했습니다.');
+
+        const importedAt = nowIso();
+        const drawId = importedDrawId || `EXCEL-${new Date().toISOString().replace(/\D/g, '').slice(0,14)}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
+        const restoredState = {
+          appVersion: APP_VERSION,
+          eventName: eventName || '엑셀 복원 대회',
+          sportName: sportName || '',
+          divisions: stateDivisions,
+          lock: {
+            locked: true,
+            lockedAt: importedAt,
+            rosterHash: 'EXCEL-RESTORED',
+            snapshot: {
+              eventName: eventName || '엑셀 복원 대회',
+              sportName: sportName || '',
+              divisions: JSON.parse(JSON.stringify(stateDivisions))
+            }
+          },
+          publicNumber: publicNumber || '',
+          numberProvider: numberProvider || '엑셀 복원본',
+          schedule: { mode: 'combined', showDetails: false, combined: { startTime: '09:00', durationMinutes: 15, courtCount: 1, preventConsecutive: true, minRestMinutes: 0, finalRestMinutes: 0, finalCourt: 1 }, perDivision: {}, divisionGroups: {}, groupSettings: {}, groupOrder: {} },
+          result: {
+            algorithm: APP_VERSION,
+            masterHash: 'EXCEL-RESTORED',
+            divisions: resultDivisions,
+            resultHash: resultHash || 'EXCEL-RESTORED'
+          },
+          audit: {
+            drawId,
+            drawnAt: importedAt,
+            publicNumber: publicNumber || '',
+            numberProvider: numberProvider || '엑셀 복원본',
+            rosterHash: 'EXCEL-RESTORED',
+            resultHash: resultHash || 'EXCEL-RESTORED',
+            autoFinalized: true,
+            drawCount: 1,
+            restoredFromExcel: true,
+            originalExcelName: file.name
+          }
+        };
+        const totalTeams = resultDivisions.reduce((sum, d) => sum + Number(d.teamCount || 0), 0);
+        const entry = {
+          id: drawId,
+          savedAt: importedAt,
+          eventName: restoredState.eventName,
+          sportName: restoredState.sportName,
+          drawnAt: importedAt,
+          publicNumber: restoredState.publicNumber,
+          totalTeams,
+          state: restoredState
+        };
+
+        const current = loadHistory();
+        let candidateId = entry.id;
+        let n = 2;
+        while (current.some(x => x?.id === candidateId)) candidateId = `${entry.id}-EX${n++}`;
+        entry.id = candidateId;
+        entry.state.audit.drawId = candidateId;
+
+        if (!writeHistory([entry, ...current])) throw new Error('브라우저 저장공간에 복원 기록을 저장할 수 없습니다.');
+        renderHistoryList();
+        toast(`${resultDivisions.length}개 종별 · ${totalTeams}팀 대진을 엑셀에서 복원했습니다.`);
+        alert(`엑셀 대진표 복원이 완료되었습니다.\n\n종별 ${resultDivisions.length}개 · 총 ${totalTeams}팀\n\n기록함에서 「대진 열기」를 누르면 복원된 대진표를 확인할 수 있습니다.\n엑셀에 없던 검증정보와 정확한 추첨 시각은 '엑셀 복원본'으로 처리됩니다.`);
+      } catch (err) {
+        console.error(err);
+        alert(`엑셀 대진표를 복원하지 못했습니다.\n\n${err.message || err}\n\n※ 이 기능은 이 프로그램에서 저장한 대진표 XLSX 형식을 기준으로 복원합니다.`);
+      }
+    }
+
+    function openGuideModal() { $('guideModal').classList.remove('hidden'); }
+    function closeGuideModal() { $('guideModal').classList.add('hidden'); }
+
+    function openHistoryModal() {
+      renderHistoryList();
+      $('historyModal').classList.remove('hidden');
+    }
+
+    function closeHistoryModal() {
+      $('historyModal').classList.add('hidden');
+    }
+
+    function restoreHistory(id) {
+      const history = loadHistory();
+      const entry = history.find(h => h?.id === id);
+      if (!entry?.state) return alert('해당 대진 기록을 불러올 수 없습니다.');
+      if (!confirm(`「${entry.eventName || '대회'}」 대진을 열까요?\n\n현재 작업 화면은 이 기록으로 바뀝니다.`)) return;
+      state = JSON.parse(JSON.stringify(entry.state));
+      selectedDivisionId = state.result?.divisions?.[0]?.divisionId || state.divisions?.[0]?.id || DEFAULT_DIVISIONS[0].id;
+      saveState();
+      closeHistoryModal();
+      renderAll();
+      toast('지난 대진을 불러왔습니다. 엑셀로 다시 저장할 수 있습니다.');
+    }
+
+    function deleteHistory(id) {
+      const history = loadHistory();
+      const entry = history.find(h => h?.id === id);
+      if (!entry) return;
+      if (!confirm(`「${entry.eventName || '대회'}」 기록을 기록함에서 삭제할까요?`)) return;
+      writeHistory(history.filter(h => h?.id !== id));
+      renderHistoryList();
+      toast('대진 기록을 삭제했습니다.');
+    }
+
+    function clearHistory() {
+      const history = loadHistory();
+      if (!history.length) return;
+      if (!confirm(`저장된 지난 대진 ${history.length}개를 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`)) return;
+      localStorage.removeItem(HISTORY_KEY);
+      renderHistoryList();
+      toast('대진 기록함을 비웠습니다.');
+    }
+
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { console.warn(e); }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (!parsed?.divisions?.length) return;
+        state = parsed;
+        if (!state.appVersion) state.appVersion = APP_VERSION;
+        if (!state.schedule) state.schedule = { mode: 'combined', showDetails: false, combined: { startTime: '09:00', durationMinutes: 15, courtCount: 1, preventConsecutive: true, minRestMinutes: 0, finalRestMinutes: 0, finalCourt: 1 }, perDivision: {}, divisionGroups: {}, groupSettings: {}, groupOrder: {} };
+      } catch (e) { console.warn(e); }
+    }
+
+    function toast(message) {
+      const el = $('toast');
+      el.textContent = message;
+      el.classList.remove('hidden');
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => el.classList.add('hidden'), 2200);
+    }
+
+    function syncInputsToState() {
+      state.eventName = $('eventName').value;
+      state.sportName = $('sportName').value;
+      state.publicNumber = $('publicNumber').value.replace(/\D/g, '').slice(0, 12);
+      state.numberProvider = $('numberProvider').value;
+    }
+
+    function renderAll() {
+      $('eventName').value = state.eventName ?? '';
+      $('sportName').value = state.sportName ?? '';
+      $('publicNumber').value = state.publicNumber ?? '';
+      $('numberProvider').value = state.numberProvider ?? '';
+      renderDivisionList();
+      updateDivisionSetupSummary();
+      renderWorkflow();
+      if (state.result) renderResults();
+      else renderEditor();
+      updateControls();
+    }
+
+    function updateDivisionSetupSummary() {
+      const el = $('divisionSetupSummary');
+      if (!el) return;
+      const total = state.divisions.reduce((sum, d) => sum + d.teams.length, 0);
+      el.textContent = `${state.divisions.length}개 종별 · 총 ${total}팀`;
+    }
+
+    function openDivisionSetup() {
+      if (state.lock.locked || state.result) {
+        alert('명단이 잠기거나 추첨이 완료된 상태에서는 종별 설정을 변경할 수 없습니다.\n필요하면 먼저 새 대회를 시작하거나 명단 잠금을 해제해 주세요.');
+        return;
+      }
+      divisionDraft = state.divisions.map(d => ({ id: d.id, name: d.name, count: d.teams.length }));
+      renderDivisionSetupRows();
+      $('divisionSetupModal').classList.remove('hidden');
+    }
+
+    function closeDivisionSetup() {
+      $('divisionSetupModal').classList.add('hidden');
+    }
+
+    function renderDivisionSetupRows() {
+      const list = $('divisionSetupList');
+      list.innerHTML = divisionDraft.map((d, i) => `<div class="setup-row" data-index="${i}">
+        <div class="field"><label>종별명</label><input class="setup-name" maxlength="30" value="${escapeHtml(d.name)}" placeholder="예: 남자부" /></div>
+        <div class="field"><label>팀 수</label><input class="setup-count" type="number" min="2" max="128" value="${d.count}" /></div>
+        <button class="btn btn-danger setup-delete" ${divisionDraft.length <= 1 ? 'disabled' : ''}>삭제</button>
+      </div>`).join('');
+
+      document.querySelectorAll('#divisionSetupList .setup-row').forEach(row => {
+        const i = Number(row.dataset.index);
+        row.querySelector('.setup-name').addEventListener('input', e => {
+          divisionDraft[i].name = e.target.value;
+          updateDivisionSetupTotal();
+        });
+        row.querySelector('.setup-count').addEventListener('input', e => {
+          divisionDraft[i].count = Math.max(2, Math.min(128, Number(e.target.value) || 2));
+          updateDivisionSetupTotal();
+        });
+        row.querySelector('.setup-delete').addEventListener('click', () => {
+          if (divisionDraft.length <= 1) return;
+          divisionDraft.splice(i, 1);
+          renderDivisionSetupRows();
+        });
+      });
+      updateDivisionSetupTotal();
+    }
+
+    function updateDivisionSetupTotal() {
+      const total = divisionDraft.reduce((sum, d) => sum + (Number(d.count) || 0), 0);
+      $('divisionSetupTotal').textContent = `${divisionDraft.length}개 종별 · 총 ${total}팀`;
+    }
+
+    function addDivisionSetupRow() {
+      divisionDraft.push({ id: makeDivisionId(), name: `종별 ${divisionDraft.length + 1}`, count: 4 });
+      renderDivisionSetupRows();
+      const inputs = document.querySelectorAll('#divisionSetupList .setup-name');
+      inputs[inputs.length - 1]?.focus();
+      inputs[inputs.length - 1]?.select();
+    }
+
+    function applyDivisionSetup() {
+      const rows = [...document.querySelectorAll('#divisionSetupList .setup-row')];
+      divisionDraft = rows.map((row, i) => ({
+        id: divisionDraft[i]?.id || makeDivisionId(),
+        name: cleanText(row.querySelector('.setup-name').value),
+        count: Math.max(2, Math.min(128, Number(row.querySelector('.setup-count').value) || 2))
+      }));
+      if (!divisionDraft.length) return alert('종별을 1개 이상 설정해 주세요.');
+      if (divisionDraft.some(d => !d.name)) return alert('모든 종별명을 입력해 주세요.');
+      const names = divisionDraft.map(d => d.name);
+      if (new Set(names).size !== names.length) return alert('같은 종별명이 중복되어 있습니다. 종별명을 다르게 입력해 주세요.');
+
+      state.divisions = divisionDraft.map(cfg => {
+        const old = state.divisions.find(d => d.id === cfg.id);
+        const oldName = old?.name || '';
+        const teams = [];
+        for (let i = 0; i < cfg.count; i++) {
+          if (old?.teams?.[i]) {
+            const prev = old.teams[i];
+            const shouldRename = !cleanText(prev.name) || (oldName && isAutoName(prev.name, oldName));
+            teams.push({ name: shouldRename ? `${cfg.name} ${i + 1}팀` : prev.name, noBye: Boolean(prev.noBye) });
+          } else {
+            teams.push({ name: `${cfg.name} ${i + 1}팀`, noBye: false });
+          }
+        }
+        return { id: cfg.id, name: cfg.name, teams };
+      });
+
+      if (!state.divisions.some(d => d.id === selectedDivisionId)) selectedDivisionId = state.divisions[0].id;
+      saveState();
+      closeDivisionSetup();
+      renderAll();
+      toast(`종별 ${state.divisions.length}개, 총 ${state.divisions.reduce((s,d) => s + d.teams.length, 0)}팀으로 설정했습니다.`);
+    }
+
+    function renderDivisionList() {
+      $('divisionList').innerHTML = state.divisions.map(d => {
+        const bye = nextPowerOfTwo(d.teams.length) - d.teams.length;
+        return `<button class="division-card ${selectedDivisionId === d.id ? 'active' : ''}" data-id="${d.id}">
+          <span class="name">${escapeHtml(d.name)}</span>
+          <span class="meta">${d.teams.length}팀 · 부전승 ${bye}팀</span>
+          ${state.lock.locked ? '<span class="check">✓</span>' : ''}
+        </button>`;
+      }).join('');
+      document.querySelectorAll('.division-card').forEach(btn => btn.addEventListener('click', () => {
+        selectedDivisionId = btn.dataset.id;
+        if (state.result) renderResults(); else renderEditor();
+        renderDivisionList();
+      }));
+    }
+
+    function renderWorkflow() {
+      const locked = state.lock.locked;
+      const hasNumber = locked && /^\d{4,12}$/.test(state.publicNumber || '');
+      const done = Boolean(state.result);
+      const steps = [$('step1'), $('step2'), $('step3'), $('step4')];
+      steps.forEach(s => s.className = 'step');
+      if (done) {
+        steps.forEach(s => s.classList.add('done'));
+      } else if (hasNumber) {
+        steps[0].classList.add('done'); steps[1].classList.add('done'); steps[2].classList.add('done'); steps[3].classList.add('active');
+      } else if (locked) {
+        steps[0].classList.add('done'); steps[1].classList.add('done'); steps[2].classList.add('active');
+      } else {
+        steps[0].classList.add('done'); steps[1].classList.add('active');
+      }
+    }
+
+    function renderEditor() {
+      const d = divisionById(selectedDivisionId) || state.divisions[0];
+      selectedDivisionId = d.id;
+      $('workspaceTitle').textContent = `${d.name} 참가팀`;
+      $('workspaceSubtitle').textContent = state.lock.locked ? '명단이 잠겼습니다. 공개번호를 입력해 주세요.' : '팀명을 입력한 뒤 Enter를 누르면 다음 팀명 칸으로 이동합니다.';
+      const byeCount = nextPowerOfTwo(d.teams.length) - d.teams.length;
+      const excludedCount = d.teams.filter(t => t.noBye).length;
+      const eligibleCount = d.teams.length - excludedCount;
+      const forced = Math.max(0, byeCount - eligibleCount);
+
+      $('workspaceContent').innerHTML = `
+        <div class="summary-cards">
+          <div class="summary-card"><div class="label">참가팀</div><div class="value">${d.teams.length}</div></div>
+          <div class="summary-card"><div class="label">대진 규모</div><div class="value">${nextPowerOfTwo(d.teams.length)}강</div></div>
+          <div class="summary-card"><div class="label">부전승</div><div class="value">${byeCount}</div></div>
+          <div class="summary-card"><div class="label">부전승 제외</div><div class="value">${excludedCount}</div></div>
+        </div>
+        ${forced ? `<div class="notice notice-warning">현재 설정으로는 부전승 가능 팀이 ${eligibleCount}팀뿐인데 부전승은 ${byeCount}팀이 필요합니다. 따라서 체크된 팀 중 ${forced}팀은 공개번호에 따라 예외적으로 부전승에 배정됩니다.</div>` : `<div class="notice notice-info">체크한 팀은 부전승 추첨에서 제외됩니다. 필요한 부전승 수보다 가능한 팀이 적을 때만 최소 인원이 예외 추첨됩니다.</div>`}
+        <div class="editor-top">
+          <div class="field" style="margin:0">
+            <label for="teamCount">참가팀 수</label>
+            <input id="teamCount" type="number" min="2" max="128" value="${d.teams.length}" ${state.lock.locked ? 'disabled' : ''} />
+          </div>
+          <div class="inline-actions">
+            <button class="btn btn-soft" id="autoNamesBtn" ${state.lock.locked ? 'disabled' : ''}>예시 팀명 채우기</button>
+            <button class="btn btn-soft" id="togglePasteBtn" ${state.lock.locked ? 'disabled' : ''}>엑셀 명단 붙여넣기</button>
+            <button class="btn btn-soft" id="uncheckAllBtn" ${state.lock.locked ? 'disabled' : ''}>모두 체크 해제</button>
+          </div>
+        </div>
+        <div class="paste-box hidden" id="pasteBox">
+          <div class="field" style="margin:0 0 8px">
+            <label>팀명 한 줄에 하나씩 붙여넣기</label>
+            <textarea id="pasteArea" placeholder="부산진초\n동래초\n해운대초"></textarea>
+          </div>
+          <div class="inline-actions">
+            <button class="btn btn-primary" id="applyPasteBtn">명단 적용</button>
+            <button class="btn btn-soft" id="cancelPasteBtn">닫기</button>
+          </div>
+        </div>
+        <div class="team-editor">
+          <div class="team-head"><span>번호</span><span>팀명</span><span>부전승 제외</span></div>
+          <div class="team-list" id="teamList">
+            ${d.teams.map((t, i) => `<div class="team-row" data-index="${i}">
+              <div class="team-no">${i + 1}</div>
+              <input class="team-name" value="${escapeHtml(t.name)}" ${state.lock.locked ? 'disabled' : ''} aria-label="${d.name} ${i + 1}번 팀명" />
+              <label class="no-bye-label"><input class="no-bye" type="checkbox" ${t.noBye ? 'checked' : ''} ${state.lock.locked ? 'disabled' : ''} /> 부전승 제외</label>
+            </div>`).join('')}
+          </div>
+        </div>`;
+
+      if (!state.lock.locked) bindEditorEvents(d);
+    }
+
+    function bindEditorEvents(d) {
+      $('teamCount').addEventListener('change', e => {
+        const count = Math.max(2, Math.min(128, Number(e.target.value) || 2));
+        const next = [];
+        for (let i = 0; i < count; i++) next.push(d.teams[i] || { name: `${d.name} ${i + 1}팀`, noBye: false });
+        d.teams = next;
+        saveState(); renderDivisionList(); renderEditor();
+      });
+      document.querySelectorAll('.team-row').forEach(row => {
+        const i = Number(row.dataset.index);
+        const nameInput = row.querySelector('.team-name');
+        const check = row.querySelector('.no-bye');
+        nameInput.addEventListener('input', () => { d.teams[i].name = nameInput.value; saveState(); });
+        nameInput.addEventListener('keydown', e => {
+          if (e.key !== 'Enter') return;
+          e.preventDefault();
+          const next = document.querySelector(`.team-row[data-index="${i + 1}"] .team-name`);
+          if (next) { next.focus(); next.select(); }
+        });
+        check.addEventListener('change', () => { d.teams[i].noBye = check.checked; saveState(); renderDivisionList(); renderEditor(); });
+      });
+      $('autoNamesBtn').addEventListener('click', () => {
+        d.teams = d.teams.map((t, i) => ({ ...t, name: (!cleanText(t.name) || isAutoName(t.name, d.name)) ? `${d.name} ${i + 1}팀` : t.name }));
+        saveState(); renderEditor(); toast('예시 팀명을 채웠습니다.');
+      });
+      $('uncheckAllBtn').addEventListener('click', () => {
+        d.teams.forEach(t => t.noBye = false); saveState(); renderEditor(); toast('모든 부전승 제외 체크를 해제했습니다.');
+      });
+      $('togglePasteBtn').addEventListener('click', () => $('pasteBox').classList.toggle('hidden'));
+      $('cancelPasteBtn').addEventListener('click', () => $('pasteBox').classList.add('hidden'));
+      $('applyPasteBtn').addEventListener('click', () => {
+        const names = $('pasteArea').value.split(/\r?\n/).map(cleanText).filter(Boolean);
+        if (names.length < 2) return alert('팀명을 두 줄 이상 붙여넣어 주세요.');
+        if (names.length > 128) return alert('한 종별당 최대 128팀까지 가능합니다.');
+        d.teams = names.map((name, i) => ({ name, noBye: d.teams[i]?.noBye || false }));
+        saveState(); renderDivisionList(); renderEditor(); toast(`${names.length}개 팀명을 적용했습니다.`);
+      });
+    }
+
+    function updateControls() {
+      const locked = state.lock.locked;
+      const done = Boolean(state.result);
+      $('eventName').disabled = locked;
+      $('sportName').disabled = locked;
+      $('divisionSetupBtn').disabled = locked || done;
+      $('lockBtn').classList.toggle('hidden', locked);
+      $('unlockBtn').classList.toggle('hidden', !locked || done);
+      $('rosterHashBox').classList.toggle('hidden', !locked);
+      if (locked) $('rosterHashBox').innerHTML = `<strong>명단 검증코드</strong><br>${escapeHtml(state.lock.rosterHash)}<br><span style="font-family:inherit">확정 시각: ${escapeHtml(formatDateTime(state.lock.lockedAt))}</span>`;
+      $('publicNumber').disabled = !locked || done;
+      $('numberProvider').disabled = !locked || done;
+      $('drawBtn').disabled = !locked || done || !/^\d{4,12}$/.test(state.publicNumber || '') || drawInProgress;
+      ['copyBtn','csvBtn','certificateBtn','xlsxBtn'].forEach(id => $(id).classList.toggle('hidden', !done));
+    }
+
+    async function lockRoster() {
+      syncInputsToState();
+      const errors = validateAll();
+      if (errors.length) return alert(errors.join('\n'));
+      const snapshot = canonicalSnapshot();
+      const rosterHash = await sha256(stableStringify(snapshot));
+      const total = snapshot.divisions.reduce((s, d) => s + d.teams.length, 0);
+      if (!confirm(`총 ${total}팀의 참가 명단을 최종 확정할까요?\n\n확정 후 공개번호를 입력합니다.`)) return;
+      state.lock = { locked: true, lockedAt: nowIso(), rosterHash, snapshot };
+      state.publicNumber = '';
+      state.numberProvider = '';
+      saveState(); renderAll();
+      $('publicNumber').focus();
+      toast('참가 명단을 잠갔습니다.');
+    }
+
+    function unlockRoster() {
+      if (state.result) return;
+      if (!confirm('추첨 전 명단 수정을 위해 잠금을 해제할까요?\n공개번호 입력값은 삭제되고 새 검증코드가 만들어집니다.')) return;
+      state.lock = { locked: false, lockedAt: '', rosterHash: '', snapshot: null };
+      state.publicNumber = '';
+      state.numberProvider = '';
+      saveState(); renderAll(); toast('명단 잠금을 해제했습니다.');
+    }
+
+    function drawSummaryRows() {
+      return state.lock.snapshot.divisions.map(d => {
+        const size = nextPowerOfTwo(d.teams.length);
+        const byes = size - d.teams.length;
+        const excluded = d.teams.filter(t => t.noBye).length;
+        const forced = Math.max(0, byes - (d.teams.length - excluded));
+        return { name: d.name, count: d.teams.length, size, byes, excluded, forced };
+      });
+    }
+
+    function openConfirmModal() {
+      syncInputsToState();
+      if (!/^\d{4,12}$/.test(state.publicNumber)) return alert('추첨에 사용할 4~12자리 공개번호를 입력해 주세요.');
+      saveState();
+      const rows = drawSummaryRows();
+      $('confirmRows').innerHTML = rows.map(r => `<tr><td><strong>${escapeHtml(r.name)}</strong></td><td>${r.count}</td><td>${r.size}강</td><td>${r.byes}</td><td>${r.excluded}</td><td>${r.forced ? `<strong style="color:#9b6500">${r.forced}팀</strong>` : '없음'}</td></tr>`).join('');
+      const forcedRows = rows.filter(r => r.forced);
+      $('confirmWarning').classList.toggle('hidden', !forcedRows.length);
+      $('confirmWarning').textContent = forcedRows.length ? `${forcedRows.map(r => `${r.name} ${r.forced}팀`).join(', ')}은(는) 부전승 가능 팀 부족으로 ‘부전승 제외’ 팀 중 최소 인원이 예외 추첨됩니다.` : '';
+      $('confirmNumber').textContent = state.publicNumber;
+      $('confirmProvider').textContent = cleanText(state.numberProvider) || '미입력';
+      $('confirmRosterHash').textContent = state.lock.rosterHash;
+      $('finalCheck').checked = false;
+      $('startDrawBtn').disabled = true;
+      $('confirmModal').classList.remove('hidden');
+    }
+
+    async function runPublicDraw() {
+      if (drawInProgress || state.result) return;
+      drawInProgress = true;
+      $('confirmModal').classList.add('hidden');
+      $('drawOverlay').classList.remove('hidden');
+      $('overlaySeed').textContent = `공개번호 ${state.publicNumber} · 명단코드 ${state.lock.rosterHash.slice(0, 12).toUpperCase()}`;
+      try {
+        const draw = await createAllDraws(state.lock.snapshot, state.publicNumber);
+        for (let n = 3; n >= 1; n--) {
+          $('countdown').textContent = n;
+          $('rollingText').textContent = '모든 종별을 같은 공개번호로 추첨합니다';
+          await delay(850);
+        }
+        $('countdown').textContent = '추첨';
+        for (const d of draw.divisions) {
+          $('drawEyebrow').textContent = `${d.divisionName} 공개 추첨`;
+          $('rollingText').textContent = `${d.teamCount}팀 · 부전승 ${d.byeCount}팀 · 1회전 ${d.rounds[0].filter(m => !m.byeTeam).length}경기`;
+          await delay(750);
+        }
+        $('countdown').textContent = '완료';
+        $('drawEyebrow').textContent = '전체 종별 추첨 자동 확정';
+        $('rollingText').textContent = `결과 검증코드 ${draw.resultHash.slice(0, 16).toUpperCase()}`;
+        await delay(1300);
+
+        const drawnAt = nowIso();
+        const drawId = `${drawnAt.slice(0,10).replaceAll('-','')}-${draw.resultHash.slice(0,8).toUpperCase()}`;
+        state.result = draw;
+        state.audit = {
+          drawId,
+          drawnAt,
+          publicNumber: state.publicNumber,
+          numberProvider: cleanText(state.numberProvider),
+          rosterHash: state.lock.rosterHash,
+          resultHash: draw.resultHash,
+          autoFinalized: true,
+          drawCount: 1
+        };
+        saveState();
+        archiveCurrentDraw();
+      } catch (err) {
+        console.error(err);
+        alert('추첨 중 오류가 발생했습니다. 명단은 그대로 유지됩니다.');
+      } finally {
+        $('drawOverlay').classList.add('hidden');
+        drawInProgress = false;
+        renderAll();
+        if (state.result) toast('전체 종별 추첨이 1회로 자동 확정되었습니다.');
+      }
+    }
+
+    let timetableCache = { key: '', bundle: null };
+
+    function normalizeSchedule() {
+      const legacy = state.schedule && !state.schedule.mode ? state.schedule : null;
+      if (!state.schedule || !state.schedule.mode) {
+        state.schedule = {
+          mode: 'combined',
+          showDetails: legacy?.showDetails === true,
+          combined: {
+            startTime: legacy?.startTime || '09:00', durationMinutes: legacy?.durationMinutes || 15, courtCount: 1,
+            preventConsecutive: true, minRestMinutes: 0, finalRestMinutes: 0, finalCourt: 1
+          },
+          perDivision: {}, divisionGroups: {}, groupSettings: {}, groupOrder: {}
+        };
+      }
+      if (typeof state.schedule.showDetails !== 'boolean') state.schedule.showDetails = false;
+      state.schedule.combined = cleanScheduleSetting(state.schedule.combined || {});
+      state.schedule.perDivision ||= {};
+      state.schedule.divisionGroups ||= {};
+      state.schedule.groupSettings ||= {};
+      state.schedule.groupOrder ||= {};
+
+      const divisions = state.result?.divisions || [];
+      divisions.forEach((d, i) => {
+        state.schedule.perDivision[d.divisionId] ||= cleanScheduleSetting({});
+        if (!state.schedule.divisionGroups[d.divisionId]) state.schedule.divisionGroups[d.divisionId] = `group_${i + 1}`;
+      });
+
+      const validIds = new Set(divisions.map(d => d.divisionId));
+      Object.keys(state.schedule.divisionGroups).forEach(id => { if (!validIds.has(id)) delete state.schedule.divisionGroups[id]; });
+
+      const usedGroups = [...new Set(divisions.map(d => state.schedule.divisionGroups[d.divisionId]).filter(Boolean))];
+      usedGroups.forEach(groupId => {
+        if (!state.schedule.groupSettings[groupId]) {
+          const firstDivision = divisions.find(d => state.schedule.divisionGroups[d.divisionId] === groupId);
+          const legacySetting = firstDivision ? state.schedule.perDivision[firstDivision.divisionId] : null;
+          state.schedule.groupSettings[groupId] = cleanScheduleSetting(legacySetting || {});
+        } else {
+          state.schedule.groupSettings[groupId] = cleanScheduleSetting(state.schedule.groupSettings[groupId]);
+        }
+
+        const members = divisions.filter(d => state.schedule.divisionGroups[d.divisionId] === groupId).map(d => d.divisionId);
+        const oldOrder = Array.isArray(state.schedule.groupOrder[groupId]) ? state.schedule.groupOrder[groupId] : [];
+        const kept = oldOrder.filter(id => members.includes(id));
+        const added = members.filter(id => !kept.includes(id));
+        state.schedule.groupOrder[groupId] = [...kept, ...added];
+      });
+
+      Object.keys(state.schedule.groupOrder).forEach(groupId => {
+        if (!usedGroups.includes(groupId)) delete state.schedule.groupOrder[groupId];
+      });
+      return state.schedule;
+    }
+
+    function cleanScheduleSetting(v = {}) {
+      const startTime = /^\d{2}:\d{2}$/.test(v.startTime || '') ? v.startTime : '09:00';
+      const durationMinutes = Math.max(1, Math.min(240, parseInt(v.durationMinutes, 10) || 15));
+      const courtCount = Math.max(1, Math.min(20, parseInt(v.courtCount, 10) || 1));
+      const preventConsecutive = v.preventConsecutive !== false;
+      const minRestMinutes = Math.max(0, Math.min(240, Number.isFinite(Number(v.minRestMinutes)) ? parseInt(v.minRestMinutes, 10) : 0));
+      const finalRestMinutes = Math.max(0, Math.min(240, Number.isFinite(Number(v.finalRestMinutes)) ? parseInt(v.finalRestMinutes, 10) : 0));
+      const finalCourt = Math.max(1, Math.min(courtCount, parseInt(v.finalCourt, 10) || 1));
+      return { startTime, durationMinutes, courtCount, preventConsecutive, minRestMinutes, finalRestMinutes, finalCourt };
+    }
+
+    function formatMinutes(total) {
+      const t = ((total % 1440) + 1440) % 1440;
+      return `${String(Math.floor(t / 60)).padStart(2,'0')}:${String(t % 60).padStart(2,'0')}`;
+    }
+
+    function minutesBetween(start, end) {
+      let d = end - start;
+      if (d < 0) d += 1440;
+      return d;
+    }
+
+    function matchDependencyKeys(division, roundIndex, matchIndex) {
+      if (roundIndex <= 0) return [];
+      const previous = division.rounds[roundIndex - 1] || [];
+      return [matchIndex * 2, matchIndex * 2 + 1]
+        .map(i => previous[i]).filter(Boolean).filter(m => !m.byeTeam)
+        .map(m => `${division.divisionId}|${m.id}`);
+    }
+
+    function buildScheduleItems(divisions) {
+      const items = [];
+      divisions.forEach((division, divisionSeq) => {
+        division.rounds.forEach((round, roundIndex) => {
+          round.forEach((match, matchIndex) => {
+            if (match.byeTeam) return;
+            items.push({
+              division, divisionId: division.divisionId, divisionName: division.divisionName,
+              divisionSeq, roundIndex, matchIndex, match,
+              key: `${division.divisionId}|${match.id}`,
+              deps: matchDependencyKeys(division, roundIndex, matchIndex),
+              isFinal: roundIndex === division.rounds.length - 1,
+              isSemi: roundIndex === division.rounds.length - 2
+            });
+          });
+        });
+      });
+      return items;
+    }
+
+    function childKeyFor(item) {
+      if (item.isFinal) return '';
+      const nextRound = item.roundIndex + 1;
+      const nextMatchIndex = Math.floor(item.matchIndex / 2);
+      return `${item.divisionId}|R${nextRound + 1}-M${nextMatchIndex + 1}`;
+    }
+
+    function effectiveRestMinutes(cfg, item) {
+      if (!cfg.preventConsecutive) return 0;
+      return item.isFinal ? Math.max(cfg.minRestMinutes, cfg.finalRestMinutes) : cfg.minRestMinutes;
+    }
+
+    function earliestSlotForItem(item, scheduledInfo, cfg) {
+      if (!item.deps.length) return 0;
+      let earliest = 0;
+      const restSlots = Math.ceil(effectiveRestMinutes(cfg, item) / cfg.durationMinutes);
+      for (const dep of item.deps) {
+        const p = scheduledInfo.get(dep);
+        if (!p) return Infinity;
+        earliest = Math.max(earliest, p.slot + 1 + restSlots);
+      }
+      return earliest;
+    }
+
+    function scheduleGroupSmart(divisions, setting, order, groupId) {
+      const cfg = cleanScheduleSetting(setting);
+      const [h, m] = cfg.startTime.split(':').map(Number);
+      const base = h * 60 + m;
+      const orderIndex = new Map((order || []).map((id, i) => [id, i]));
+      const items = buildScheduleItems(divisions);
+      const byKey = new Map(items.map(i => [i.key, i]));
+      const scheduledInfo = new Map();
+      const scheduled = new Set();
+      const divisionStarted = new Map();
+      const divisionLastSlot = new Map();
+      const waitingSince = new Map();
+      const slotRows = [];
+      let slot = 0, safety = 0;
+
+      while (scheduled.size < items.length && safety++ < 20000) {
+        const available = [];
+        for (const item of items) {
+          if (scheduled.has(item.key)) continue;
+          const earliest = earliestSlotForItem(item, scheduledInfo, cfg);
+          if (earliest <= slot) {
+            if (!waitingSince.has(item.key)) waitingSince.set(item.key, slot);
+            available.push({ ...item, earliest });
+          }
+        }
+
+        if (!available.length) { slot++; continue; }
+
+        available.forEach(item => {
+          const rank = orderIndex.has(item.divisionId) ? orderIndex.get(item.divisionId) : 999;
+          const priorityBase = Math.max(0, divisions.length - rank) * 10000;
+          const startedBoost = divisionStarted.has(item.divisionId) ? 900 : 0;
+          const deepRoundBoost = item.roundIndex * 180;
+          const finalBoost = item.isFinal ? 900 : (item.isSemi ? 350 : 0);
+          const waitBoost = Math.max(0, slot - (waitingSince.get(item.key) ?? slot)) * 35;
+
+          const childKey = childKeyFor(item);
+          let unlockBoost = 0;
+          if (childKey && byKey.has(childKey)) {
+            const child = byKey.get(childKey);
+            const siblingReady = child.deps.filter(k => k !== item.key).every(k => scheduledInfo.has(k));
+            if (siblingReady) unlockBoost = 220;
+          }
+          item.score = priorityBase + startedBoost + deepRoundBoost + finalBoost + waitBoost + unlockBoost;
+        });
+
+        available.sort((a,b) => b.score - a.score || a.roundIndex - b.roundIndex || a.matchIndex - b.matchIndex);
+        const chosen = available.slice(0, cfg.courtCount);
+
+        // 결승/준결승 코트 선호를 먼저 반영한다.
+        const courtOrder = Array.from({length: cfg.courtCount}, (_, i) => i + 1);
+        const freeCourts = new Set(courtOrder);
+        const assignOrder = [...chosen].sort((a,b) => Number(b.isFinal) - Number(a.isFinal) || Number(b.isSemi) - Number(a.isSemi));
+        const slotAssignments = [];
+
+        for (const item of assignOrder) {
+          let court = null;
+          if (item.isFinal && freeCourts.has(cfg.finalCourt)) court = cfg.finalCourt;
+          else if (item.isSemi) {
+            court = [1,2].find(c => freeCourts.has(c)) || null;
+          }
+          if (!court) court = [...freeCourts][0];
+          freeCourts.delete(court);
+
+          const startMinute = base + slot * cfg.durationMinutes;
+          const info = {
+            key: item.key, groupId, divisionId: item.divisionId, divisionName: item.divisionName,
+            matchId: item.match.id, match: item.match, roundIndex: item.roundIndex,
+            roundName: roundTitle(item.division.bracketSize, item.roundIndex),
+            isFinal: item.isFinal, isSemi: item.isSemi,
+            slot, court, startMinute, endMinute: startMinute + cfg.durationMinutes,
+            time: formatMinutes(startMinute), endTime: formatMinutes(startMinute + cfg.durationMinutes),
+            score: item.score
+          };
+          scheduled.add(item.key);
+          scheduledInfo.set(item.key, info);
+          divisionStarted.set(item.divisionId, Math.min(divisionStarted.get(item.divisionId) ?? slot, slot));
+          divisionLastSlot.set(item.divisionId, slot);
+          slotAssignments.push(info);
+        }
+        slotRows.push({slot, assignments: slotAssignments});
+        slot++;
+      }
+
+      return { groupId, cfg, items, map: scheduledInfo, slotRows, divisions };
+    }
+
+    function validateGroupSchedule(groupBundle) {
+      const { cfg, items, map, divisions } = groupBundle;
+      const errors = [];
+      const seenCourt = new Set();
+
+      for (const item of items) {
+        const info = map.get(item.key);
+        if (!info) { errors.push(`${item.divisionName} ${item.match.id}: 미배정 경기`); continue; }
+        const ck = `${info.slot}|${info.court}`;
+        if (seenCourt.has(ck)) errors.push(`${info.time} ${info.court}코트: 중복 배정`);
+        seenCourt.add(ck);
+
+        const earliest = earliestSlotForItem(item, map, cfg);
+        if (item.deps.length && info.slot < earliest) {
+          errors.push(`${item.divisionName} ${item.match.id}: 선행경기/휴식시간 조건 위반`);
+        }
+      }
+
+      divisions.forEach(d => {
+        const actual = items.filter(i => i.divisionId === d.divisionId).length;
+        const expected = Math.max(0, d.teamCount - 1);
+        if (actual !== expected) errors.push(`${d.divisionName}: 실제 경기 ${actual}경기 ≠ 예상 ${expected}경기(참가팀-1)`);
+      });
+
+      return errors;
+    }
+
+    function groupSummary(groupBundle) {
+      const infos = [...groupBundle.map.values()];
+      if (!infos.length) return { start:'-', end:'-', games:0, slots:0, utilization:0, idle:0 };
+      const minSlot = Math.min(...infos.map(x => x.slot));
+      const maxSlot = Math.max(...infos.map(x => x.slot));
+      const slots = maxSlot - minSlot + 1;
+      const capacity = slots * groupBundle.cfg.courtCount;
+      const idle = Math.max(0, capacity - infos.length);
+      return {
+        start: formatMinutes(Math.min(...infos.map(x => x.startMinute))),
+        end: formatMinutes(Math.max(...infos.map(x => x.endMinute))),
+        games: infos.length, slots,
+        utilization: capacity ? Math.round(infos.length / capacity * 100) : 0,
+        idle
+      };
+    }
+
+    function scheduleCacheKey() {
+      return JSON.stringify({
+        resultHash: state.result?.resultHash || state.audit?.drawId || '',
+        schedule: normalizeSchedule()
+      });
+    }
+
+    function buildTimetableBundle() {
+      if (!state.result) return { map:new Map(), groups:[], errors:['대진표가 없습니다.'] };
+      const schedule = normalizeSchedule();
+      const groups = [];
+      const allMap = new Map();
+
+      if (schedule.mode === 'separate') {
+        const grouped = new Map();
+        state.result.divisions.forEach(d => {
+          const gid = schedule.divisionGroups[d.divisionId] || `group_${d.divisionId}`;
+          if (!grouped.has(gid)) grouped.set(gid, []);
+          grouped.get(gid).push(d);
+        });
+        grouped.forEach((divisions, gid) => {
+          const order = schedule.groupOrder[gid] || divisions.map(d => d.divisionId);
+          const bundle = scheduleGroupSmart(divisions, schedule.groupSettings[gid], order, gid);
+          bundle.errors = validateGroupSchedule(bundle);
+          groups.push(bundle);
+          bundle.map.forEach((v,k) => allMap.set(k,v));
+        });
+      } else {
+        const divisions = state.result.divisions;
+        const order = divisions.map(d => d.divisionId);
+        const bundle = scheduleGroupSmart(divisions, schedule.combined, order, 'combined');
+        bundle.errors = validateGroupSchedule(bundle);
+        groups.push(bundle);
+        bundle.map.forEach((v,k) => allMap.set(k,v));
+      }
+      return { map: allMap, groups, errors: groups.flatMap(g => g.errors || []) };
+    }
+
+    function timetableBundle() {
+      const key = scheduleCacheKey();
+      if (timetableCache.key !== key || !timetableCache.bundle) {
+        timetableCache = { key, bundle: buildTimetableBundle() };
+      }
+      return timetableCache.bundle;
+    }
+
+    function scheduledMatchInfo() { return timetableBundle().map; }
+
+    function matchScheduledInfo(divisionId, match) {
+      if (!match || match.byeTeam) return null;
+      return timetableBundle().map.get(`${divisionId}|${match.id}`) || null;
+    }
+
+    function matchScheduledTime(divisionId, match) {
+      const schedule = normalizeSchedule();
+      if (schedule.showDetails === false) return '';
+      const info = matchScheduledInfo(divisionId, match);
+      return info ? `${info.time} · ${info.court}코트` : '';
+    }
+
+    function groupLabel(groupId) {
+      if (groupId === 'combined') return '전체 종별 통합';
+      const n = String(groupId || '').match(/group_(\d+)/)?.[1];
+      return n ? `그룹 ${n}` : String(groupId || '그룹');
+    }
+
+    const GROUP_COLOR_PALETTE = [
+      { bg:'#e8f0ff', border:'#9bb7f5', text:'#244a9b' },
+      { bg:'#e9f8ef', border:'#9ed3b0', text:'#17653a' },
+      { bg:'#fff3df', border:'#e8c38a', text:'#865713' },
+      { bg:'#f5eaff', border:'#c8a8e8', text:'#673691' },
+      { bg:'#ffe9ed', border:'#e8a6b2', text:'#913047' },
+      { bg:'#e7f8f8', border:'#91cdcf', text:'#17686b' },
+      { bg:'#fff8d9', border:'#dfca75', text:'#75600b' },
+      { bg:'#edf0f4', border:'#b7c0cc', text:'#455263' },
+      { bg:'#e9f3ff', border:'#9fc2e7', text:'#285c8d' },
+      { bg:'#f8ecdf', border:'#d7b38f', text:'#79502e' },
+      { bg:'#eef7e5', border:'#b4d397', text:'#476e24' },
+      { bg:'#fcebf7', border:'#d8acd0', text:'#7f3971' }
+    ];
+
+    function groupColorStyle(groupId) {
+      const n = Number(String(groupId || '').match(/group_(\d+)/)?.[1] || 1);
+      const c = GROUP_COLOR_PALETTE[(Math.max(1, n) - 1) % GROUP_COLOR_PALETTE.length];
+      return `background:${c.bg};border-color:${c.border};color:${c.text};`;
+    }
+
+    function divisionTimetableSummaries(bundle) {
+      const rows = [];
+      state.result.divisions.forEach(d => {
+        const infos = [...bundle.map.values()].filter(x => x.divisionId === d.divisionId);
+        if (!infos.length) return;
+        const first = infos.reduce((a,b) => a.startMinute < b.startMinute ? a : b);
+        const last = infos.reduce((a,b) => a.endMinute > b.endMinute ? a : b);
+        const final = infos.find(x => x.isFinal);
+        rows.push({
+          name:d.divisionName, teams:d.teamCount, games:infos.length,
+          first:first.time, final:final?.time || '-', end:last.endTime,
+          span: Math.max(0, last.endMinute - first.startMinute)
+        });
+      });
+      return rows;
+    }
+
+    function timetableHtml() {
+      const bundle = timetableBundle();
+      const allInfos = [...bundle.map.values()];
+      const overallStart = allInfos.length ? Math.min(...allInfos.map(x => x.startMinute)) : 0;
+      const overallEnd = allInfos.length ? Math.max(...allInfos.map(x => x.endMinute)) : 0;
+      const totalGames = allInfos.length;
+      const errors = bundle.errors || [];
+      const divRows = divisionTimetableSummaries(bundle);
+
+      const summary = `<div class="timetable-summary-grid">
+        <div class="timetable-summary-card"><div class="k">총 경기</div><div class="v">${totalGames}경기</div></div>
+        <div class="timetable-summary-card"><div class="k">시작</div><div class="v">${totalGames ? formatMinutes(overallStart) : '-'}</div></div>
+        <div class="timetable-summary-card"><div class="k">예상 종료</div><div class="v">${totalGames ? formatMinutes(overallEnd) : '-'}</div></div>
+        <div class="timetable-summary-card"><div class="k">검증</div><div class="v" style="font-size:13px;color:${errors.length ? 'var(--danger)' : 'var(--success)'}">${errors.length ? `오류 ${errors.length}건` : '✓ 이상 없음'}</div></div>
+      </div>`;
+
+      const groupBlocks = bundle.groups.map(g => {
+        const s = groupSummary(g);
+        const bySlot = new Map();
+        [...g.map.values()].forEach(info => {
+          if (!bySlot.has(info.slot)) bySlot.set(info.slot, []);
+          bySlot.get(info.slot).push(info);
+        });
+        const slots = [...bySlot.keys()].sort((a,b)=>a-b);
+        const head = Array.from({length:g.cfg.courtCount},(_,i)=>`<th>${i+1}코트</th>`).join('');
+        const body = slots.map(slot => {
+          const infos = bySlot.get(slot);
+          const byCourt = new Map(infos.map(x=>[x.court,x]));
+          const t = infos[0]?.time || '';
+          const cells = Array.from({length:g.cfg.courtCount},(_,i)=>{
+            const x = byCourt.get(i+1);
+            if (!x) return '<td></td>';
+            const cls = x.isFinal ? 'tt-final' : '';
+            return `<td class="${cls}"><div class="tt-match">${escapeHtml(x.divisionName)} · ${escapeHtml(x.roundName)} · ${escapeHtml(x.matchId)}
+              <span class="sub">${escapeHtml(x.match.a)} vs ${escapeHtml(x.match.b)}</span></div></td>`;
+          }).join('');
+          return `<tr><th>${escapeHtml(t)}</th>${cells}</tr>`;
+        }).join('');
+        return `<section class="timetable-group-block">
+          <div class="timetable-group-head"><h3>${escapeHtml(groupLabel(g.groupId))}</h3>
+            <span>${s.games}경기 · ${s.start}~${s.end} · 코트 가동률 ${s.utilization}% · 빈 코트 슬롯 ${s.idle}</span></div>
+          <div class="timetable-table-wrap"><table class="timetable-table"><thead><tr><th>시간</th>${head}</tr></thead><tbody>${body}</tbody></table></div>
+        </section>`;
+      }).join('');
+
+      const divisionSummary = `<h3 style="margin:18px 0 7px">종별 요약</h3>
+        <div class="timetable-table-wrap"><table class="division-summary-table"><thead><tr>
+          <th>종별</th><th>참가팀</th><th>실제 경기</th><th>첫 경기</th><th>결승</th><th>종료</th><th>운영시간</th>
+        </tr></thead><tbody>${divRows.map(r=>`<tr><td>${escapeHtml(r.name)}</td><td>${r.teams}</td><td>${r.games}</td><td>${r.first}</td><td>${r.final}</td><td>${r.end}</td><td>${Math.floor(r.span/60)}시간 ${r.span%60}분</td></tr>`).join('')}</tbody></table></div>`;
+
+      const validation = errors.length
+        ? `<div class="notice notice-warning"><strong>타임테이블 검증 오류 ${errors.length}건</strong><br>${errors.slice(0,12).map(e=>escapeHtml(e)).join('<br>')}${errors.length>12?'<br>…':''}</div>`
+        : `<div class="notice notice-success"><strong>✓ 타임테이블 검증 완료</strong><br>코트 중복, 선행경기, 최소 휴식, 부전승, 전체 경기 수 조건을 충족합니다.</div>`;
+
+      return summary + validation + groupBlocks + divisionSummary;
+    }
+
+    function openTimetableModal() {
+      $('timetableModalBody').innerHTML = timetableHtml();
+      $('timetableModal').classList.remove('hidden');
+    }
+
+    function schedulePanelHtml() {
+      const schedule = normalizeSchedule();
+      const mode = schedule.mode || 'combined';
+      const combined = cleanScheduleSetting(schedule.combined);
+      const divisions = state.result.divisions;
+      const groupOptions = divisions.map((_, i) => `group_${i + 1}`);
+
+      const assignmentRows = divisions.map(d => {
+        const selectedGroup = schedule.divisionGroups[d.divisionId];
+        const options = groupOptions.map(g => `<option value="${g}" style="${groupColorStyle(g)}" ${g === selectedGroup ? 'selected' : ''}>${escapeHtml(groupLabel(g))}</option>`).join('');
+        const order = schedule.groupOrder[selectedGroup] || [];
+        const members = divisions.filter(x => schedule.divisionGroups[x.divisionId] === selectedGroup);
+        const currentRank = Math.max(0, order.indexOf(d.divisionId)) + 1;
+        const priorityOptions = members.map((_, i) => `<option value="${i + 1}" ${i + 1 === currentRank ? 'selected' : ''}>${i + 1}순위</option>`).join('');
+        return `<div class="schedule-group-assignment-row" data-division-id="${escapeHtml(d.divisionId)}">
+          <strong>${escapeHtml(d.divisionName)}</strong>
+          <select class="division-group-select" style="${groupColorStyle(selectedGroup)}">${options}</select>
+          <select class="division-priority-select">${priorityOptions}</select>
+        </div>`;
+      }).join('');
+
+      const usedGroups = [...new Set(divisions.map(d => schedule.divisionGroups[d.divisionId]))]
+        .sort((a,b) => Number((a.match(/\d+/)||[999])[0]) - Number((b.match(/\d+/)||[999])[0]));
+
+      const settingFields = (v, prefix='') => `
+        <div class="field"><label>시작시간</label><input class="${prefix}start" type="time" value="${escapeHtml(v.startTime)}"></div>
+        <div class="field"><label>소요시간(분)</label><input class="${prefix}duration" type="number" min="1" max="240" value="${v.durationMinutes}"></div>
+        <div class="field"><label>코트 수</label><input class="${prefix}courts" type="number" min="1" max="20" value="${v.courtCount}"></div>
+        <div class="field"><label>최소 휴식(분)</label><input class="${prefix}rest" type="number" min="0" max="240" value="${v.minRestMinutes}" ${v.preventConsecutive?'':'disabled'}></div>
+        <div class="field"><label>결승 전 휴식(분)</label><input class="${prefix}final-rest" type="number" min="0" max="240" value="${v.finalRestMinutes}" ${v.preventConsecutive?'':'disabled'}></div>
+        <div class="field"><label>결승 코트</label><input class="${prefix}final-court" type="number" min="1" max="${v.courtCount}" value="${v.finalCourt}"></div>`;
+
+      const groupRows = usedGroups.map(groupId => {
+        const members = divisions.filter(d => schedule.divisionGroups[d.divisionId] === groupId);
+        const v = cleanScheduleSetting(schedule.groupSettings[groupId]);
+        return `<div class="schedule-group-row" data-group-id="${escapeHtml(groupId)}">
+          <div><div class="schedule-group-title">${escapeHtml(groupLabel(groupId))}</div>
+            <div class="schedule-group-members">${escapeHtml(members.map(d => d.divisionName).join(' · '))}</div>
+            <div class="toggle-wrap">
+              <span style="font-size:11px;font-weight:900">연속 경기 방지</span>
+              <label class="toggle-switch" aria-label="${escapeHtml(groupLabel(groupId))} 연속 경기 방지 ON/OFF">
+                <input class="group-prevent" type="checkbox" ${v.preventConsecutive?'checked':''}>
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-state">${v.preventConsecutive ? 'ON' : 'OFF'}</span>
+              <span class="toggle-help">ON: 최소 휴식시간 적용 · OFF: 별도 휴식시간 강제 안 함</span>
+            </div>
+          </div>
+          ${settingFields(v,'group-')}
+        </div>`;
+      }).join('');
+
+      const validation = timetableBundle().errors || [];
+
+      return `<div class="schedule-panel no-print">
+        <div class="schedule-title">⏱ 스마트 경기 타임테이블</div>
+        <div class="schedule-mode-row">
+          <label><input type="checkbox" id="scheduleShowDetails" ${schedule.showDetails === true ? 'checked' : ''}> 대진표에 경기시간 · 코트 표시</label>
+          <span class="schedule-note" style="padding:0;align-self:center">끄면 설정값은 유지되고 대진표·인쇄·CSV·엑셀에서만 표시가 숨겨집니다.</span>
+        </div>
+        <div id="scheduleSettingsArea" class="${schedule.showDetails === false ? 'hidden' : ''}">
+          <div class="schedule-mode-row">
+            <label><input type="radio" name="scheduleMode" value="combined" ${mode==='combined'?'checked':''}> 전체 종별 통합 진행</label>
+            <label><input type="radio" name="scheduleMode" value="separate" ${mode==='separate'?'checked':''}> 종별 별도 진행</label>
+          </div>
+          <div id="combinedScheduleBox" class="${mode==='combined'?'':'hidden'}">
+            <div class="notice notice-info" style="margin:0 0 8px"><strong>Dependency 기반 편성</strong> · 라운드 전체 종료를 기다리지 않고 선행경기와 휴식조건이 충족된 독립 대진은 다음 라운드로 진행합니다.</div>
+            <div class="schedule-group-row" data-group-id="combined">
+              <div><div class="schedule-group-title">전체 통합 설정</div>
+                <div class="schedule-group-members">모든 종별이 같은 코트 풀을 사용합니다.</div>
+                <div class="toggle-wrap">
+                  <span style="font-size:11px;font-weight:900">연속 경기 방지</span>
+                  <label class="toggle-switch" aria-label="연속 경기 방지 ON/OFF">
+                    <input id="combinedPrevent" type="checkbox" ${combined.preventConsecutive?'checked':''}>
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <span class="toggle-state" id="combinedPreventState">${combined.preventConsecutive ? 'ON' : 'OFF'}</span>
+                  <span class="toggle-help">ON: 앞 경기를 치른 팀이 설정한 최소 휴식시간을 확보한 뒤 다음 경기를 배정합니다. OFF: 선행경기 종료 후 별도 휴식시간을 강제하지 않습니다.</span>
+                </div>
+              </div>
+              ${settingFields(combined,'combined-')}
+            </div>
+          </div>
+          <div id="separateScheduleBox" class="${mode==='separate'?'':'hidden'}">
+            <div class="notice notice-success" style="margin:0 0 10px"><strong>집중 진행 방식</strong> · 높은 우선순위 종별의 가능한 경기를 먼저 배정하고, 휴식 때문에 생긴 빈 코트는 다음 순위 종별로 채웁니다.</div>
+            <div class="schedule-note" style="padding:0 0 8px"><strong>① 종별 운영 그룹 · 우선순위 지정</strong> · 같은 그룹 안에서는 1순위 종별을 먼저 진행하지만, 코트를 비워두기 위해 다른 종별을 억지로 늦추지는 않습니다.</div>
+            <div class="schedule-group-assignment">${assignmentRows}</div>
+            <div class="schedule-note" style="padding:2px 0 6px"><strong>② 그룹별 시간표 설정</strong> · 최소 휴식, 결승 전 휴식, 결승 코트를 그룹마다 다르게 지정할 수 있습니다.</div>
+            <div class="schedule-group-settings">${groupRows}</div>
+          </div>
+          <div class="schedule-actions">
+            <button class="btn btn-primary" id="timetableBtn">타임테이블 생성 · 보기</button>
+            <span class="schedule-validation ${validation.length?'bad':'ok'}">${validation.length ? `⚠ 검증 오류 ${validation.length}건` : '✓ 타임테이블 검증 완료'}</span>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function bindScheduleEvents() {
+      const rerender = msg => { timetableCache = {key:'',bundle:null}; saveState(); renderResults(); if(msg) toast(msg); };
+
+      $('scheduleShowDetails')?.addEventListener('change', e => {
+        normalizeSchedule().showDetails = Boolean(e.target.checked);
+        rerender(e.target.checked ? '경기시간·코트 표시를 켰습니다.' : '경기시간·코트 표시를 숨겼습니다.');
+      });
+      document.querySelectorAll('input[name="scheduleMode"]').forEach(el => el.addEventListener('change', e => {
+        normalizeSchedule().mode = e.target.value; rerender('대회 진행 방식을 변경했습니다.');
+      }));
+      $('timetableBtn')?.addEventListener('click', openTimetableModal);
+
+      const readSetting = (root, prefix, preventEl) => cleanScheduleSetting({
+        startTime: root.querySelector(`.${prefix}start`)?.value,
+        durationMinutes: root.querySelector(`.${prefix}duration`)?.value,
+        courtCount: root.querySelector(`.${prefix}courts`)?.value,
+        minRestMinutes: root.querySelector(`.${prefix}rest`)?.value,
+        finalRestMinutes: root.querySelector(`.${prefix}final-rest`)?.value,
+        finalCourt: root.querySelector(`.${prefix}final-court`)?.value,
+        preventConsecutive: Boolean(preventEl?.checked)
+      });
+
+      const combinedRow = document.querySelector('.schedule-group-row[data-group-id="combined"]');
+      if (combinedRow) {
+        combinedRow.querySelectorAll('input').forEach(inp => inp.addEventListener('change', () => {
+          const prevent = $('combinedPrevent');
+          const stateLabel = $('combinedPreventState');
+          if (stateLabel && prevent) stateLabel.textContent = prevent.checked ? 'ON' : 'OFF';
+          normalizeSchedule().combined = readSetting(combinedRow, 'combined-', prevent);
+          rerender('통합 타임테이블을 다시 계산했습니다.');
+        }));
+      }
+
+      document.querySelectorAll('.schedule-group-assignment-row').forEach(row => {
+        row.querySelector('.division-group-select')?.addEventListener('change', e => {
+          const s = normalizeSchedule(), divisionId = row.dataset.divisionId, newGroup = e.target.value;
+          if (!s.groupSettings[newGroup]) s.groupSettings[newGroup] = cleanScheduleSetting({});
+          Object.keys(s.groupOrder || {}).forEach(g => s.groupOrder[g] = (s.groupOrder[g] || []).filter(id => id !== divisionId));
+          s.divisionGroups[divisionId] = newGroup;
+          s.groupOrder[newGroup] ||= []; s.groupOrder[newGroup].push(divisionId);
+          rerender('종별 운영 그룹을 변경했습니다.');
+        });
+
+        row.querySelector('.division-priority-select')?.addEventListener('change', e => {
+          const s = normalizeSchedule(), divisionId = row.dataset.divisionId, groupId = s.divisionGroups[divisionId];
+          const order = [...(s.groupOrder[groupId] || [])];
+          const currentIndex = order.indexOf(divisionId), targetIndex = Math.max(0, Math.min(order.length - 1, Number(e.target.value) - 1));
+          if (currentIndex >= 0 && currentIndex !== targetIndex) {
+            const other = order[targetIndex]; order[targetIndex] = divisionId; order[currentIndex] = other; s.groupOrder[groupId] = order;
+          }
+          rerender(`${groupLabel(groupId)} 종별 진행 우선순위를 변경했습니다.`);
+        });
+      });
+
+      document.querySelectorAll('.schedule-group-row[data-group-id]:not([data-group-id="combined"])').forEach(row => {
+        row.querySelectorAll('input').forEach(inp => inp.addEventListener('change', () => {
+          const s = normalizeSchedule(), groupId = row.dataset.groupId;
+          const prevent = row.querySelector('.group-prevent');
+          const stateLabel = row.querySelector('.toggle-state');
+          if (stateLabel && prevent) stateLabel.textContent = prevent.checked ? 'ON' : 'OFF';
+          s.groupSettings[groupId] = readSetting(row, 'group-', prevent);
+          rerender(`${groupLabel(groupId)} 타임테이블을 다시 계산했습니다.`);
+        }));
+      });
+    }
+
+    function renderResults() {
+      const audit = state.audit;
+      $('workspaceTitle').textContent = `${state.eventName}${state.sportName ? ` · ${state.sportName}` : ''}`;
+      $('workspaceSubtitle').textContent = `추첨번호 ${audit.drawId} · 완료 즉시 자동 확정`;
+      if (!state.result.divisions.some(d => d.divisionId === selectedDivisionId)) selectedDivisionId = state.result.divisions[0].divisionId;
+      const selected = state.result.divisions.find(d => d.divisionId === selectedDivisionId);
+      const allForPrint = state.result.divisions.map(d =>
+        d.divisionId === 'high_m'
+          ? highMaleSplitPrintHtml(d)
+          : divisionResultHtml(d, d.divisionId === selectedDivisionId)
+      ).join('');
+      $('workspaceContent').innerHTML = `
+        <div class="result-header">
+          <div><h2>공개 추첨 완료</h2><p>${escapeHtml(formatDateTime(audit.drawnAt))}<br>카톡 공개번호와 잠긴 참가 명단으로 생성되었으며, 추첨 횟수는 1회입니다.</p></div>
+          <div class="result-header-actions no-print">
+            <span class="final-badge">🔒 자동 최종 확정</span>
+            <button class="btn btn-primary result-print-btn" id="resultXlsxBtn">📊 엑셀 대진표 저장</button>
+          </div>
+        </div>
+        <div class="result-tabs no-print">${state.result.divisions.map(d => `<button class="result-tab ${d.divisionId === selectedDivisionId ? 'active' : ''}" data-result-id="${d.divisionId}">${escapeHtml(d.divisionName)} ${d.teamCount}팀</button>`).join('')}</div>
+        ${schedulePanelHtml()}
+        <div id="screenResult">${divisionResultHtml(selected, true)}</div>
+        <div class="hidden print-all" id="printAllResults">${allForPrint}</div>
+        ${auditHtml(audit)}`;
+      $('resultXlsxBtn')?.addEventListener('click', exportXlsxBracket);
+      bindScheduleEvents();
+      document.querySelectorAll('.result-tab').forEach(btn => btn.addEventListener('click', () => {
+        selectedDivisionId = btn.dataset.resultId;
+        renderDivisionList(); renderResults();
+      }));
+      scheduleBracketConnectors();
+    }
+
+    let connectorRaf = 0;
+    function scheduleBracketConnectors() {
+      cancelAnimationFrame(connectorRaf);
+      connectorRaf = requestAnimationFrame(() => requestAnimationFrame(() => {
+        configurePrintSizing();
+        layoutBracketRounds();
+        drawBracketConnectors();
+      }));
+    }
+
+    function layoutBracketRounds() {
+      document.querySelectorAll('.tournament-board').forEach(board => {
+        if (board.offsetParent === null || board.clientWidth === 0) return;
+        const rounds = [...board.querySelectorAll('.t-round')];
+        if (!rounds.length) return;
+
+        // 매번 자연 배치 상태로 되돌린 뒤 실제 박스 높이를 다시 측정합니다.
+        rounds.forEach((round, ri) => {
+          round.classList.remove('bracket-aligned');
+          const stack = round.querySelector('.t-round-stack');
+          if (!stack) return;
+          stack.style.height = '';
+          stack.style.paddingTop = '0px';
+          const compactPrint = document.body.classList.contains('print-preparing');
+          stack.style.gap = compactPrint ? '3px' : '28px';
+          [...stack.querySelectorAll('.t-match-wrap')].forEach(w => {
+            w.style.top = '';
+            w.style.left = '';
+            w.style.right = '';
+          });
+        });
+
+        const boardRect = board.getBoundingClientRect();
+        const boardTop = boardRect.top - board.scrollTop;
+        const firstRound = rounds[0];
+        const firstStack = firstRound.querySelector('.t-round-stack');
+        const firstMatches = [...firstRound.querySelectorAll('.t-match-wrap')];
+        if (!firstStack || !firstMatches.length) return;
+
+        // 첫 라운드는 촘촘하게 두고, 다음 라운드는 앞선 두 경기의 정확한 중앙에 둡니다.
+        let previousCenters = firstMatches.map(w => {
+          const match = w.querySelector('.t-match') || w;
+          const r = match.getBoundingClientRect();
+          return r.top - boardTop + r.height / 2;
+        });
+
+        const firstStackRect = firstStack.getBoundingClientRect();
+        const firstStackTop = firstStackRect.top - boardTop;
+        const firstStackHeight = firstStack.scrollHeight;
+
+        for (let ri = 1; ri < rounds.length; ri++) {
+          const round = rounds[ri];
+          const stack = round.querySelector('.t-round-stack');
+          const wraps = [...round.querySelectorAll('.t-match-wrap')];
+          if (!stack || !wraps.length) continue;
+
+          // absolute 배치 전에 각 경기박스가 wrapper 안에서 차지하는 중심 위치를 측정합니다.
+          const localCenters = wraps.map(w => {
+            const wr = w.getBoundingClientRect();
+            const match = w.querySelector('.t-match') || w;
+            const mr = match.getBoundingClientRect();
+            return (mr.top - wr.top) + mr.height / 2;
+          });
+          const wrapHeights = wraps.map(w => w.getBoundingClientRect().height);
+
+          const stackRect = stack.getBoundingClientRect();
+          const stackTop = stackRect.top - boardTop;
+          const desiredCenters = wraps.map((w, i) => {
+            const c1 = previousCenters[i * 2];
+            const c2 = previousCenters[i * 2 + 1];
+            if (c1 == null) return previousCenters[previousCenters.length - 1] || firstStackTop;
+            return c2 == null ? c1 : (c1 + c2) / 2;
+          });
+
+          round.classList.add('bracket-aligned');
+          let maxBottom = firstStackHeight;
+          wraps.forEach((w, i) => {
+            const top = Math.max(0, desiredCenters[i] - stackTop - localCenters[i]);
+            w.style.top = `${top}px`;
+            maxBottom = Math.max(maxBottom, top + wrapHeights[i]);
+          });
+          stack.style.height = `${maxBottom}px`;
+          previousCenters = desiredCenters;
+        }
+
+        // 모든 열의 높이를 첫 라운드 전체 높이에 맞춰 유지해 오른쪽 열이 중앙에 안정적으로 배치되게 합니다.
+        rounds.forEach(round => {
+          const stack = round.querySelector('.t-round-stack');
+          if (stack) stack.style.minHeight = `${firstStackHeight}px`;
+        });
+      });
+    }
+
+    function drawBracketConnectors() {
+      document.querySelectorAll('.tournament-board').forEach(board => {
+        board.querySelectorAll('.bracket-connectors').forEach(svg => svg.remove());
+        if (board.offsetParent === null || board.clientWidth === 0) return;
+
+        const rounds = [...board.querySelectorAll('.t-round')];
+        if (rounds.length < 2) return;
+
+        const boardRect = board.getBoundingClientRect();
+        const width = Math.max(board.scrollWidth, board.clientWidth);
+        const height = Math.max(board.scrollHeight, board.clientHeight);
+        const ns = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('class', 'bracket-connectors');
+        svg.setAttribute('width', width);
+        svg.setAttribute('height', height);
+        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+        const point = el => {
+          const r = el.getBoundingClientRect();
+          return {
+            left: r.left - boardRect.left + board.scrollLeft,
+            right: r.right - boardRect.left + board.scrollLeft,
+            y: r.top - boardRect.top + board.scrollTop + r.height / 2
+          };
+        };
+        const addPath = d => {
+          const path = document.createElementNS(ns, 'path');
+          path.setAttribute('class', 'bracket-connector-line');
+          path.setAttribute('d', d);
+          svg.appendChild(path);
+        };
+
+        for (let ri = 0; ri < rounds.length - 1; ri++) {
+          const sources = [...rounds[ri].querySelectorAll('.t-match-wrap .t-match')];
+          const targets = [...rounds[ri + 1].querySelectorAll('.t-match-wrap .t-match')];
+          targets.forEach((target, ti) => {
+            const s1 = sources[ti * 2];
+            const s2 = sources[ti * 2 + 1];
+            if (!s1 || !s2) return;
+            const p1 = point(s1);
+            const p2 = point(s2);
+            const pt = point(target);
+            const startX = Math.max(p1.right, p2.right);
+            const endX = pt.left;
+            const midX = startX + (endX - startX) / 2;
+            const minY = Math.min(p1.y, p2.y, pt.y);
+            const maxY = Math.max(p1.y, p2.y, pt.y);
+
+            addPath(`M ${startX} ${p1.y} H ${midX}`);
+            addPath(`M ${startX} ${p2.y} H ${midX}`);
+            addPath(`M ${midX} ${minY} V ${maxY}`);
+            addPath(`M ${midX} ${pt.y} H ${endX}`);
+          });
+        }
+        board.prepend(svg);
+      });
+    }
+
+    function divisionResultHtml(d, visible) {
+      const firstRoundGames = d.rounds[0].filter(m => !m.byeTeam).length;
+      const bracketLabel = `${d.bracketSize}강 대진`;
+      return `<section class="division-result" data-division="${d.divisionId}">
+        <div class="print-fit-content">
+        <div class="division-banner">
+          <div>
+            <h2>${escapeHtml(d.divisionName)} 대진표</h2>
+            <p>참가팀 ${d.teamCount}팀 · ${bracketLabel} · 부전승 ${d.byeCount}팀 · 1회전 ${firstRoundGames}경기</p>
+          </div>
+          <div class="division-stamp">공개 추첨 확정</div>
+        </div>
+        <div class="summary-cards">
+          <div class="summary-card"><div class="label">종별</div><div class="value">${escapeHtml(d.divisionName)}</div></div>
+          <div class="summary-card"><div class="label">참가팀</div><div class="value">${d.teamCount}</div></div>
+          <div class="summary-card"><div class="label">부전승</div><div class="value">${d.byeCount}</div></div>
+          <div class="summary-card"><div class="label">1회전 경기</div><div class="value">${firstRoundGames}</div></div>
+        </div>
+        ${d.forcedByeCount ? `<div class="notice notice-warning">부전승 제외 팀이 많아 체크된 팀 중 ${d.forcedByeCount}팀이 예외적으로 부전승에 배정되었습니다.</div>` : ''}
+        <div class="tournament-board" style="--round-cols:${d.rounds.length}">
+          ${d.rounds.map((round, ri) => {
+            return `<section class="t-round">
+              <div class="t-round-head">${roundTitle(d.bracketSize, ri)}</div>
+              <div class="t-round-stack">
+                ${round.map((m, mi) => `<div class="t-match-wrap" data-round="${ri}" data-match="${mi}">${matchCardHtml(m, ri, mi, d.divisionId)}</div>`).join('')}
+              </div>
+            </section>`;
+          }).join('')}
+        </div>
+        <div class="t-legend">
+          <span class="t-legend-chip normal">부전승 팀은 1회전 열에서 바로 확인할 수 있습니다.</span>
+          ${d.forcedByeCount ? `<span class="t-legend-chip forced">예외 부전승은 노란 표시로 강조됩니다.</span>` : ''}
+        </div>
+        <div class="print-meta">${escapeHtml(state.eventName)}${state.sportName ? ` · ${escapeHtml(state.sportName)}` : ''} · 추첨번호 ${escapeHtml(state.audit?.drawId || '')}</div>
+        </div>
+      </section>`;
+    }
+
+    function highMaleSplitPrintHtml(d) {
+      const printableRounds = d.rounds.slice(0, -1);
+      const buildHalf = (halfKey, halfLabel) => {
+        const halfRounds = printableRounds.map(round => {
+          const half = Math.ceil(round.length / 2);
+          return halfKey === 'top' ? round.slice(0, half) : round.slice(round.length - half);
+        });
+        const halfFirstRound = halfRounds[0] || [];
+        const actualTeams = new Set();
+        halfFirstRound.forEach(m => {
+          if (m.a && m.a !== '부전승') actualTeams.add(m.a);
+          if (m.b && m.b !== '부전승') actualTeams.add(m.b);
+        });
+        const byeInHalf = halfFirstRound.filter(m => m.byeTeam).length;
+
+        return `<section class="division-result high-split-page" data-division="${d.divisionId}" data-print-half="${halfKey}">
+          <div class="print-fit-content">
+            <div class="division-banner">
+              <div>
+                <h2>${escapeHtml(d.divisionName)} 대진표 · ${halfLabel}</h2>
+                <p>전체 ${d.teamCount}팀 중 ${halfLabel} 영역 · 실제 배정 ${actualTeams.size}팀 · 부전승 ${byeInHalf}팀</p>
+              </div>
+              <div class="division-stamp">${halfLabel} 게시용</div>
+            </div>
+            <div class="split-page-note">이 장은 남고부 전체 대진의 ${halfLabel}입니다. 출력 후 ${halfKey === 'top' ? '위쪽' : '아래쪽'}에 게시하세요.</div>
+            <div class="tournament-board" style="--round-cols:${halfRounds.length}">
+              ${halfRounds.map((round, ri) => `<section class="t-round">
+                <div class="t-round-head">${roundTitle(d.bracketSize, ri)}</div>
+                <div class="t-round-stack">
+                  ${round.map((m, mi) => `<div class="t-match-wrap" data-round="${ri}" data-match="${mi}">${matchCardHtml(m, ri, mi, d.divisionId)}</div>`).join('')}
+                </div>
+              </section>`).join('')}
+            </div>
+            <div class="split-final-note">남고부 결승: 상단 준결승 승자 vs 하단 준결승 승자</div>
+            <div class="print-meta">${escapeHtml(state.eventName)}${state.sportName ? ` · ${escapeHtml(state.sportName)}` : ''} · 남고부 ${halfLabel} · 추첨번호 ${escapeHtml(state.audit?.drawId || '')}</div>
+          </div>
+        </section>`;
+      };
+      return buildHalf('top', '상단') + buildHalf('bottom', '하단');
+    }
+
+    function splitTeamDisplay(name) {
+      const cleaned = String(name ?? '').trim();
+      if (!cleaned || cleaned === '부전승') return { main: '부전승', sub: '' };
+      if (cleaned.includes(' 승자')) return { main: cleaned, sub: '' };
+      const parts = cleaned.split(/\s+/);
+      if (parts.length >= 2) {
+        return { main: parts[0], sub: parts.slice(1).join(' ') };
+      }
+      return { main: cleaned, sub: '' };
+    }
+
+    function matchCardHtml(m, roundIndex = 0, matchIndex = 0, divisionId = selectedDivisionId) {
+      const bye = Boolean(m.byeTeam);
+      const label = bye ? '부전승' : `${m.id}`;
+      const a = splitTeamDisplay(m.a);
+      const b = splitTeamDisplay(m.b);
+      const byeText = m.forcedBye ? '예외' : '';
+      const scheduledTime = matchScheduledTime(divisionId, m);
+      return `<div>
+        <div class="t-match-label">${escapeHtml(label)}${scheduledTime ? `<span class="match-time">${escapeHtml(scheduledTime)}</span>` : ''}</div>
+        <article class="t-match ${bye ? 'bye-match' : ''}">
+          <div class="t-row ${a.main === '부전승' ? 'bye-row' : ''}">
+            <div class="t-team-main">
+              <div class="t-team-name">${escapeHtml(a.main)}</div>
+              ${a.sub ? `<div class="t-team-sub">${escapeHtml(a.sub)}</div>` : ''}
+            </div>
+            <div class="t-score ${bye && m.a !== '부전승' ? (m.forcedBye ? 'forced' : 'bye-tag') : 'muted'}">${escapeHtml(bye && m.a !== '부전승' ? byeText : '')}</div>
+          </div>
+          <div class="t-row ${b.main === '부전승' ? 'bye-row' : ''}">
+            <div class="t-team-main">
+              <div class="t-team-name">${escapeHtml(b.main)}</div>
+              ${b.sub ? `<div class="t-team-sub">${escapeHtml(b.sub)}</div>` : ''}
+            </div>
+            <div class="t-score ${bye && m.b !== '부전승' ? (m.forcedBye ? 'forced' : 'bye-tag') : 'muted'}">${escapeHtml(bye && m.b !== '부전승' ? byeText : '')}</div>
+          </div>
+        </article>
+      </div>`;
+    }
+
+    function auditHtml(a) {
+      return `<div class="audit">
+        <h3>추첨 검증 정보</h3>
+        <div class="audit-grid">
+          <div class="k">추첨 식별번호</div><div class="v">${escapeHtml(a.drawId)}</div>
+          <div class="k">추첨 완료 시각</div><div class="v">${escapeHtml(formatDateTime(a.drawnAt))}</div>
+          <div class="k">카톡 공개번호</div><div class="v">${escapeHtml(a.publicNumber)}</div>
+          <div class="k">번호 제시자</div><div class="v">${escapeHtml(a.numberProvider || '미입력')}</div>
+          <div class="k">명단 검증코드</div><div class="v">${escapeHtml(a.rosterHash)}</div>
+          <div class="k">결과 검증코드</div><div class="v">${escapeHtml(a.resultHash)}</div>
+          <div class="k">추첨 횟수</div><div class="v">1회 · 완료 즉시 자동 확정</div>
+          <div class="k">프로그램 제작</div><div class="v">${escapeHtml(CREATOR)}</div>
+        </div>
+      </div>`;
+    }
+
+    function copyResultText() {
+      if (!state.result) return;
+      const lines = [
+        `[${state.eventName}${state.sportName ? ' · ' + state.sportName : ''} 대진 추첨 결과]`,
+        `추첨 시각: ${formatDateTime(state.audit.drawnAt)}`,
+        `공개번호: ${state.audit.publicNumber}${state.audit.numberProvider ? ` (${state.audit.numberProvider})` : ''}`,
+        `추첨 식별번호: ${state.audit.drawId}`,
+        `추첨 횟수: 1회 · 자동 확정`, ''
+      ];
+      state.result.divisions.forEach(d => {
+        lines.push(`■ ${d.divisionName} ${d.teamCount}팀`);
+        lines.push(`부전승(${d.byeCount}팀): ${d.byeTeams.map(t => t.name + (t.forced ? '[예외]' : '')).join(', ') || '없음'}`);
+        d.rounds[0].filter(m => !m.byeTeam).forEach(m => lines.push(`${m.id}: ${m.a} vs ${m.b}`));
+        lines.push('');
+      });
+      lines.push(`결과 검증코드: ${state.audit.resultHash.slice(0, 24).toUpperCase()}`);
+      navigator.clipboard?.writeText(lines.join('\n')).then(() => toast('카톡용 결과를 복사했습니다.')).catch(() => {
+        const ta = document.createElement('textarea'); ta.value = lines.join('\n'); document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('카톡용 결과를 복사했습니다.');
+      });
+    }
+
+    function csvEscape(v) { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replaceAll('"','""')}"` : s; }
+    function exportCsv() {
+      if (!state.result) return;
+      const rows = [['대회명', state.eventName], ['종목', state.sportName], ['프로그램 제작', CREATOR], ['추첨 식별번호', state.audit.drawId], ['추첨 시각', formatDateTime(state.audit.drawnAt)], ['공개번호', state.audit.publicNumber], ['명단 검증코드', state.audit.rosterHash], ['결과 검증코드', state.audit.resultHash], [], ['종별','라운드','경기번호','경기시간','팀A','팀B','구분']];
+      state.result.divisions.forEach(d => d.rounds.forEach((round, ri) => round.forEach(m => rows.push([d.divisionName, roundTitle(d.bracketSize, ri), m.id, matchScheduledTime(d.divisionId, m), m.a, m.b, m.byeTeam ? (m.forcedBye ? '예외 부전승' : '부전승') : '대진']))));
+      downloadBlob('\uFEFF' + rows.map(r => r.map(csvEscape).join(',')).join('\r\n'), `${safeFileName(state.eventName)}_대진표.csv`, 'text/csv;charset=utf-8');
+    }
+
+    // 추첨 결과를 실제 .xlsx 대진표로 저장합니다. (외부 라이브러리 불필요)
+    function exportXlsxBracket() {
+      if (!state.result) return;
+      try {
+        const sheets = state.result.divisions.map(d => ({ name: d.divisionName, xml: buildBracketSheetXml(d) }));
+        const bytes = makeZip(buildXlsxPackage(sheets));
+        const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${safeFileName(state.eventName)}${state.sportName ? '_' + safeFileName(state.sportName) : ''}_대진표.xlsx`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        toast('윤곽선·연결선이 적용된 엑셀 대진표를 저장했습니다.');
+      } catch (err) {
+        console.error(err);
+        alert('엑셀 파일 생성 중 오류가 발생했습니다.');
+      }
+    }
+
+    function xmlEscape(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&apos;' }[ch]));
+    }
+    function excelCol(n) {
+      let s = '';
+      while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }
+      return s;
+    }
+    function excelCell(row, col, value, style = 0) {
+      const ref = `${excelCol(col)}${row}`;
+      return `<c r="${ref}" t="inlineStr" s="${style}"><is><t xml:space="preserve">${xmlEscape(value ?? '')}</t></is></c>`;
+    }
+
+    function buildBracketSheetXml(d) {
+      const rows = new Map(), rowHeights = new Map(), merges = [];
+      const add = (r,c,v,st=0) => { if(!rows.has(r)) rows.set(r,[]); rows.get(r).push({c,xml:excelCell(r,c,v,st)}); };
+      const blank = (r,c,st=0) => add(r,c,'',st);
+      const merge = (r1,c1,r2,c2) => merges.push(`${excelCol(c1)}${r1}:${excelCol(c2)}${r2}`);
+      // 한 라운드 = 팀명 2열 + 상태 1열 + 연결선 2열.
+      // 마지막 라운드는 연결선 열이 필요 없으므로 전체 열에서 2열을 뺍니다.
+      const roundSpan = 5;
+      const totalCols = d.rounds.length * roundSpan - 2;
+      const lastCol = excelCol(totalCols);
+
+      merge(1,1,1,totalCols);
+      add(1,1,`${state.eventName}${state.sportName ? ' · ' + state.sportName : ''} · ${d.divisionName} 대진표`,1);
+      rowHeights.set(1,32);
+      merge(2,1,2,totalCols);
+      add(2,1,`참가 ${d.teamCount}팀 · ${d.bracketSize}강형 · 부전승 ${d.byeCount}팀 · 추첨번호 ${state.audit?.drawId || ''} · 제작 ${CREATOR}`,6);
+      rowHeights.set(2,21);
+
+      d.rounds.forEach((round,ri)=>{
+        const sc=1+ri*roundSpan;
+        merge(4,sc,4,sc+2);
+        add(4,sc,roundTitle(d.bracketSize,ri),1);
+        blank(4,sc+1,1); blank(4,sc+2,1);
+      });
+      rowHeights.set(4,27);
+
+      const base=6;
+      // 각 경기 박스의 위치를 먼저 계산해 연결선이 정확히 가운데로 모이게 합니다.
+      const roundCenters = [];
+      d.rounds.forEach((round,ri)=>{
+        const step=4*(2**ri), offset=(2**(ri+1))-2;
+        roundCenters[ri]=round.map((_,mi)=>base+offset+mi*step); // top row의 아래 경계 = 경기 중앙선
+      });
+
+      d.rounds.forEach((round,ri)=>{
+        const sc=1+ri*roundSpan;
+        const gapLeft=sc+3, gapRight=sc+4;
+        const step=4*(2**ri), offset=(2**(ri+1))-2;
+
+        round.forEach((m,mi)=>{
+          const top=base+offset+mi*step, bottom=top+1;
+          rowHeights.set(top,26); rowHeights.set(bottom,26);
+          const aBye=m.a==='부전승', bBye=m.b==='부전승';
+          const aAdv=Boolean(m.byeTeam)&&!aBye, bAdv=Boolean(m.byeTeam)&&!bBye;
+          const aStyle=aAdv?3:(aBye?5:2), bStyle=bAdv?3:(bBye?5:2);
+
+          merge(top,sc,top,sc+1); merge(bottom,sc,bottom,sc+1);
+          add(top,sc,m.a,aStyle); blank(top,sc+1,aStyle);
+          add(bottom,sc,m.b,bStyle); blank(bottom,sc+1,bStyle);
+          const byeLabel=m.forcedBye?'예외 부전승':'부전승';
+          const scheduledTime=matchScheduledTime(d.divisionId,m);
+          add(top,sc+2,aAdv?byeLabel:(scheduledTime?scheduledTime:''),aAdv?4:2);
+          add(bottom,sc+2,bAdv?byeLabel:'',bAdv?4:2);
+        });
+
+        if(ri<d.rounds.length-1){
+          // 앞 라운드의 두 경기 중앙을 세로선으로 묶고,
+          // 그 정확한 중간 높이에서 다음 라운드 경기 박스로 연결합니다.
+          for(let pair=0; pair<Math.ceil(round.length/2); pair++){
+            const firstIndex=pair*2;
+            const secondIndex=Math.min(firstIndex+1, round.length-1);
+            const c1=roundCenters[ri][firstIndex];
+            const c2=roundCenters[ri][secondIndex];
+            const nextCenter=roundCenters[ri+1][pair];
+
+            // 위 경기 → 세로 접점까지 가로선
+            blank(c1,gapLeft,8);
+
+            // 두 경기 사이 세로선. 아래 경기 행에서는 가로선까지 같이 표시합니다.
+            if(c2>c1){
+              for(let r=c1+1; r<c2; r++) blank(r,gapLeft,9);
+              blank(c2,gapLeft,10);
+            }
+
+            // 세로선 접점 → 다음 라운드 박스까지 가로선
+            blank(nextCenter,gapRight,8);
+          }
+        }
+      });
+
+      const auditRow=base+(d.rounds[0]?.length||1)*4+2;
+      merge(auditRow,1,auditRow,totalCols);
+      add(auditRow,1,`공개번호 ${state.audit?.publicNumber || ''} · 번호 제시자 ${state.audit?.numberProvider || '미입력'} · 결과 검증코드 ${(state.audit?.resultHash || '').slice(0,24).toUpperCase()} · 제작 ${CREATOR}`,6);
+      rowHeights.set(auditRow,20);
+
+      const cols=[];
+      for(let ri=0;ri<d.rounds.length;ri++){
+        const sc=1+ri*roundSpan;
+        cols.push(`<col min="${sc}" max="${sc+1}" width="15.5" customWidth="1"/>`);
+        cols.push(`<col min="${sc+2}" max="${sc+2}" width="10.5" customWidth="1"/>`);
+        if(ri<d.rounds.length-1){
+          cols.push(`<col min="${sc+3}" max="${sc+3}" width="3.5" customWidth="1"/>`);
+          cols.push(`<col min="${sc+4}" max="${sc+4}" width="3.5" customWidth="1"/>`);
+        }
+      }
+      const rowXml=[...rows.keys()].sort((a,b)=>a-b).map(r=>{
+        const h=rowHeights.get(r), cs=rows.get(r).sort((a,b)=>a.c-b.c).map(x=>x.xml).join('');
+        return `<row r="${r}"${h?` ht="${h}" customHeight="1"`:''}>${cs}</row>`;
+      }).join('');
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:${lastCol}${auditRow}"/><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols>${cols.join('')}</cols><sheetData>${rowXml}</sheetData>${merges.length?`<mergeCells count="${merges.length}">${merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>`:''}<pageMargins left="0.25" right="0.25" top="0.35" bottom="0.35" header="0.1" footer="0.1"/><pageSetup orientation="landscape" fitToWidth="1" fitToHeight="1" paperSize="9"/></worksheet>`;
+    }
+
+    function buildXlsxPackage(sheets) {
+      const contentTypes=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
+      const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`;
+      const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((sh,i)=>`<sheet name="${xmlEscape(sh.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets></workbook>`;
+      const wbRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+      const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <fonts count="3">
+          <font><sz val="10"/><name val="맑은 고딕"/></font>
+          <font><b/><color rgb="FFFFFFFF"/><sz val="12"/><name val="맑은 고딕"/></font>
+          <font><b/><sz val="10"/><name val="맑은 고딕"/></font>
+        </fonts>
+        <fills count="6">
+          <fill><patternFill patternType="none"/></fill>
+          <fill><patternFill patternType="gray125"/></fill>
+          <fill><patternFill patternType="solid"><fgColor rgb="FF4748D5"/></patternFill></fill>
+          <fill><patternFill patternType="solid"><fgColor rgb="FFE9EDF3"/></patternFill></fill>
+          <fill><patternFill patternType="solid"><fgColor rgb="FFE9F8F2"/></patternFill></fill>
+          <fill><patternFill patternType="solid"><fgColor rgb="FFFFF7E5"/></patternFill></fill>
+        </fills>
+        <borders count="6">
+          <border/>
+          <border><left style="medium"><color rgb="FF8C95A3"/></left><right style="medium"><color rgb="FF8C95A3"/></right><top style="medium"><color rgb="FF8C95A3"/></top><bottom style="medium"><color rgb="FF8C95A3"/></bottom></border>
+          <border><bottom style="medium"><color rgb="FF7D8796"/></bottom></border>
+          <border><right style="medium"><color rgb="FF7D8796"/></right></border>
+          <border><right style="medium"><color rgb="FF7D8796"/></right><bottom style="medium"><color rgb="FF7D8796"/></bottom></border>
+          <border><left style="thin"><color rgb="FFD1D6DE"/></left><right style="thin"><color rgb="FFD1D6DE"/></right><top style="thin"><color rgb="FFD1D6DE"/></top><bottom style="thin"><color rgb="FFD1D6DE"/></bottom></border>
+        </borders>
+        <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+        <cellXfs count="11">
+          <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+          <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+          <xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+          <xf numFmtId="0" fontId="2" fillId="4" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+          <xf numFmtId="0" fontId="2" fillId="5" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+          <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+          <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="left" vertical="center" wrapText="1"/></xf>
+          <xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+          <xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0"/>
+          <xf numFmtId="0" fontId="0" fillId="0" borderId="3" xfId="0"/>
+          <xf numFmtId="0" fontId="0" fillId="0" borderId="4" xfId="0"/>
+        </cellXfs>
+        <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+      </styleSheet>`;
+      const coreProps=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:creator>${xmlEscape(CREATOR)}</dc:creator><cp:lastModifiedBy>${xmlEscape(CREATOR)}</cp:lastModifiedBy><dc:title>${xmlEscape(state.eventName)} 대진표</dc:title></cp:coreProperties>`;
+      const out=[{name:'[Content_Types].xml',data:contentTypes},{name:'docProps/core.xml',data:coreProps},{name:'_rels/.rels',data:rootRels},{name:'xl/workbook.xml',data:workbook},{name:'xl/_rels/workbook.xml.rels',data:wbRels},{name:'xl/styles.xml',data:styles}];
+      sheets.forEach((sh,i)=>out.push({name:`xl/worksheets/sheet${i+1}.xml`,data:sh.xml})); return out;
+    }
+
+    function crc32(bytes){ if(!crc32.table){crc32.table=Array.from({length:256},(_,n)=>{let c=n;for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);return c>>>0;});}let c=0xFFFFFFFF;for(const b of bytes)c=crc32.table[(c^b)&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0; }
+    function le16(n){return Uint8Array.of(n&255,(n>>>8)&255);} function le32(n){return Uint8Array.of(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255);}
+    function concatBytes(parts){const len=parts.reduce((s,p)=>s+p.length,0),out=new Uint8Array(len);let o=0;parts.forEach(p=>{out.set(p,o);o+=p.length;});return out;}
+    function makeZip(files){const enc=new TextEncoder(),locals=[],centrals=[];let offset=0;files.forEach(f=>{const name=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data);const local=concatBytes([le32(0x04034b50),le16(20),le16(0),le16(0),le16(0),le16(0),le32(crc),le32(data.length),le32(data.length),le16(name.length),le16(0),name,data]);locals.push(local);const central=concatBytes([le32(0x02014b50),le16(20),le16(20),le16(0),le16(0),le16(0),le16(0),le32(crc),le32(data.length),le32(data.length),le16(name.length),le16(0),le16(0),le16(0),le16(0),le32(0),le32(offset),name]);centrals.push(central);offset+=local.length;});const cd=concatBytes(centrals),end=concatBytes([le32(0x06054b50),le16(0),le16(0),le16(files.length),le16(files.length),le32(cd.length),le32(offset),le16(0)]);return concatBytes([...locals,cd,end]);}
+
+    function certificateObject() {
+      return {
+        certificateType: 'SPORTS_CLUB_PUBLIC_DRAW',
+        appVersion: APP_VERSION,
+        creator: CREATOR,
+        eventName: state.eventName,
+        sportName: state.sportName,
+        snapshot: state.lock.snapshot,
+        publicNumber: state.audit.publicNumber,
+        numberProvider: state.audit.numberProvider,
+        lock: state.lock,
+        result: state.result,
+        audit: state.audit
+      };
+    }
+    function downloadCertificate() {
+      downloadBlob(JSON.stringify(certificateObject(), null, 2), `${safeFileName(state.eventName)}_${state.audit.drawId}_추첨증명서.json`, 'application/json');
+    }
+    function safeFileName(name) { return cleanText(name).replace(/[\\/:*?"<>|]/g, '_') || '스포츠클럽'; }
+    function downloadBlob(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    async function verifyCertificate(file) {
+      try {
+        const cert = JSON.parse(await file.text());
+        if (cert.certificateType !== 'SPORTS_CLUB_PUBLIC_DRAW' || !cert.snapshot || !cert.publicNumber || !cert.result) throw new Error('지원하지 않는 증명서 형식입니다.');
+        const rosterHash = await sha256(stableStringify(cert.snapshot));
+        const generated = await createAllDraws(cert.snapshot, String(cert.publicNumber));
+        const rosterOk = rosterHash === cert.lock?.rosterHash;
+        const resultOk = generated.resultHash === cert.result?.resultHash && generated.resultHash === cert.audit?.resultHash;
+        alert(resultOk && rosterOk
+          ? `검증 성공\n\n명단과 공개번호로 같은 대진 결과가 재현되었습니다.\n추첨 식별번호: ${cert.audit?.drawId || '-'}\n결과코드: ${generated.resultHash}`
+          : `검증 실패\n\n명단 또는 결과가 증명서 생성 이후 변경되었을 가능성이 있습니다.\n명단 일치: ${rosterOk ? '예' : '아니오'}\n결과 일치: ${resultOk ? '예' : '아니오'}`);
+      } catch (e) { alert(`증명서 검증 오류: ${e.message}`); }
+    }
+
+    function clearPrintFit() {
+      document.querySelectorAll('#printAllResults .print-fit-content').forEach(content => {
+        content.style.transform = '';
+        content.style.width = '';
+        content.style.marginLeft = '';
+        content.style.marginTop = '';
+      });
+      document.body.classList.remove('print-preparing');
+      const all = $('printAllResults');
+      if (all) all.style.width = '';
+    }
+
+    function configurePrintSizing() {
+      // 종별 규모에 따라 가로 한 장의 면적을 최대한 채우도록 박스와 글자를 다르게 키웁니다.
+      document.querySelectorAll('#printAllResults .division-result').forEach(section => {
+        const divisionId = section.dataset.division;
+        const d = state.result?.divisions?.find(x => x.divisionId === divisionId);
+        const n = d?.teamCount || 16;
+        const rounds = d?.rounds?.length || 4;
+        let cfg;
+        const isHighSplit = section.classList.contains('high-split-page');
+        if (isHighSplit) {
+          cfg = { roundWidth: 150, rowHeight: 30, teamFont: 10.5, subFont: 7.5, scoreFont: 8.5, headFont: 13, labelFont: 8, headPad: 7, teamPad: 5, scoreWidth: 34, boardGap: 13, roundPad: 10 };
+        } else if (n <= 10) {
+          cfg = { roundWidth: 118, rowHeight: 48, teamFont: 12, subFont: 8.5, scoreFont: 9, headFont: 14, labelFont: 9, headPad: 8, teamPad: 7, scoreWidth: 38, boardGap: 10, roundPad: 8 };
+        } else if (n <= 24) {
+          cfg = { roundWidth: 118, rowHeight: 30, teamFont: 9.5, subFont: 7, scoreFont: 8, headFont: 12, labelFont: 7.5, headPad: 6, teamPad: 4, scoreWidth: 32, boardGap: 9, roundPad: 7 };
+        } else if (n <= 32) {
+          cfg = { roundWidth: 112, rowHeight: 24, teamFont: 8, subFont: 6, scoreFont: 7, headFont: 10.5, labelFont: 6.5, headPad: 5, teamPad: 3, scoreWidth: 29, boardGap: 8, roundPad: 6 };
+        } else {
+          cfg = { roundWidth: 104, rowHeight: 17, teamFont: 6.8, subFont: 5.2, scoreFont: 6, headFont: 9, labelFont: 5.5, headPad: 4, teamPad: 2, scoreWidth: 25, boardGap: 7, roundPad: 5 };
+        }
+        // 라운드가 적은 종별은 가로 폭 여유가 있으므로 박스 폭도 추가 확대합니다.
+        if (rounds <= 4) cfg.roundWidth += 10;
+        section.style.setProperty('--print-round-width', `${cfg.roundWidth}px`);
+        section.style.setProperty('--print-row-height', `${cfg.rowHeight}px`);
+        section.style.setProperty('--print-team-font', `${cfg.teamFont}px`);
+        section.style.setProperty('--print-sub-font', `${cfg.subFont}px`);
+        section.style.setProperty('--print-score-font', `${cfg.scoreFont}px`);
+        section.style.setProperty('--print-head-font', `${cfg.headFont}px`);
+        section.style.setProperty('--print-label-font', `${cfg.labelFont}px`);
+        section.style.setProperty('--print-head-pad', `${cfg.headPad}px`);
+        section.style.setProperty('--print-team-pad', `${cfg.teamPad}px`);
+        section.style.setProperty('--print-score-width', `${cfg.scoreWidth}px`);
+        section.style.setProperty('--print-board-gap', `${cfg.boardGap}px`);
+        section.style.setProperty('--print-round-pad', `${cfg.roundPad}px`);
+      });
+    }
+
+    function applyPrintFit() {
+      // 가로형 한 장의 사용 가능한 영역을 최대한 채우도록 확대/축소합니다.
+      // 남고부는 상단/하단 두 장으로 나눠 더 큰 글자와 박스를 유지합니다.
+      const targetWidth = 1085;  // 가로 인쇄 실사용 폭 약 287mm
+      const targetHeight = 756;  // 가로 인쇄 실사용 높이 약 200mm
+      document.querySelectorAll('#printAllResults .division-result').forEach(section => {
+        const content = section.querySelector('.print-fit-content');
+        if (!content) return;
+        content.style.transform = 'none';
+        content.style.marginLeft = '0';
+        content.style.marginTop = '0';
+        content.style.width = 'max-content';
+        const contentWidth = Math.max(content.scrollWidth, content.getBoundingClientRect().width);
+        const contentHeight = Math.max(content.scrollHeight, content.getBoundingClientRect().height);
+        const scale = Math.min(targetWidth / Math.max(1, contentWidth), targetHeight / Math.max(1, contentHeight));
+        content.style.width = `${contentWidth}px`;
+        content.style.transform = `scale(${Math.max(0.12, Math.min(2.4, scale))})`;
+        content.style.marginLeft = `${Math.max(0, (targetWidth - contentWidth * Math.min(2.4, scale)) / 2)}px`;
+        content.style.marginTop = `${Math.max(0, (targetHeight - contentHeight * Math.min(2.4, scale)) / 2)}px`;
+        section.dataset.printScale = scale.toFixed(3);
+      });
+    }
+
+    function preparePrintLayout(callback) {
+      const screen = $('screenResult');
+      const all = $('printAllResults');
+      screen?.classList.add('hidden');
+      all?.classList.remove('hidden');
+      document.body.classList.add('print-preparing');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        configurePrintSizing();
+        layoutBracketRounds();
+        drawBracketConnectors();
+        applyPrintFit();
+        if (callback) callback();
+      }));
+    }
+
+    function printResults() {
+      preparePrintLayout(() => setTimeout(() => window.print(), 80));
+    }
+
+    function parseReleaseVersion(value) {
+      return String(value || '').trim().replace(/^v/i, '').split('.').map(part => {
+        const n = parseInt(part, 10);
+        return Number.isFinite(n) ? n : 0;
+      });
+    }
+
+    function compareReleaseVersions(a, b) {
+      const av = parseReleaseVersion(a);
+      const bv = parseReleaseVersion(b);
+      const len = Math.max(av.length, bv.length, 3);
+      for (let i = 0; i < len; i++) {
+        const x = av[i] || 0, y = bv[i] || 0;
+        if (x > y) return 1;
+        if (x < y) return -1;
+      }
+      return 0;
+    }
+
+    function openUpdateModal() {
+      $('updateCurrentVersion').textContent = `v${RELEASE_VERSION}`;
+      $('currentVersionBadge').textContent = `v${RELEASE_VERSION}`;
+      $('updateModal').classList.remove('hidden');
+      checkForUpdates();
+    }
+
+    function closeUpdateModal() {
+      $('updateModal').classList.add('hidden');
+    }
+
+    function loadUpdateScript(url) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `__sportsDrawUpdate_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement('script');
+        let timer;
+        const cleanup = () => {
+          clearTimeout(timer);
+          try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+          script.remove();
+        };
+        window[callbackName] = info => {
+          cleanup();
+          resolve(info);
+        };
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('업데이트 서버 연결 실패'));
+        };
+        script.src = `${url}?callback=${encodeURIComponent(callbackName)}&t=${Date.now()}`;
+        script.async = true;
+        document.head.appendChild(script);
+        timer = setTimeout(() => {
+          cleanup();
+          reject(new Error('업데이트 서버 응답 시간 초과'));
+        }, 7000);
+      });
+    }
+
+    async function fetchUpdateInfoJson() {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 7000);
+      try {
+        const sep = UPDATE_API_URL.includes('?') ? '&' : '?';
+        const response = await fetch(`${UPDATE_API_URL}${sep}t=${Date.now()}`, {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' },
+          signal: controller.signal
+        });
+        if (!response.ok) throw new Error(`업데이트 서버 HTTP ${response.status}`);
+        const info = await response.json();
+        if (!info || !info.version) throw new Error('버전 정보 형식이 올바르지 않습니다.');
+        return info;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function loadRemoteUpdateInfo() {
+      let primaryError = null;
+      try {
+        return await fetchUpdateInfoJson();
+      } catch (err) {
+        primaryError = err;
+        console.warn('Update API failed, trying legacy endpoint:', err);
+      }
+
+      let lastError = primaryError;
+      for (const url of UPDATE_SCRIPT_URLS) {
+        try {
+          const info = await loadUpdateScript(url);
+          if (info && info.version) return info;
+          lastError = new Error('버전 정보 형식이 올바르지 않습니다.');
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError || new Error('업데이트 서버에 연결할 수 없습니다.');
+    }
+
+    async function checkForUpdates() {
+      const status = $('updateStatus');
+      const latestEl = $('updateLatestVersion');
+      const releasedEl = $('updateReleasedAt');
+      const notesBox = $('updateNotesBox');
+      const notesList = $('updateNotesList');
+      const downloadBtn = $('downloadUpdateBtn');
+      const checkBtn = $('checkUpdateBtn');
+
+      status.className = 'update-status';
+      status.textContent = '최신 버전 정보를 확인하고 있습니다…';
+      latestEl.textContent = '확인 중';
+      releasedEl.textContent = '확인 중';
+      notesBox.classList.add('hidden');
+      downloadBtn.classList.add('hidden');
+      downloadBtn.dataset.url = '';
+      checkBtn.disabled = true;
+
+      try {
+        const info = await loadRemoteUpdateInfo();
+        if (!info || !info.version) throw new Error('버전 정보 형식이 올바르지 않습니다.');
+
+        const latest = String(info.version).replace(/^v/i, '');
+        latestEl.textContent = `v${latest}`;
+        releasedEl.textContent = info.releasedAt || '-';
+
+        const notes = Array.isArray(info.notes) ? info.notes : [];
+        if (notes.length) {
+          notesList.innerHTML = notes.map(note => `<li>${escapeHtml(note)}</li>`).join('');
+          notesBox.classList.remove('hidden');
+        }
+
+        const cmp = compareReleaseVersions(RELEASE_VERSION, latest);
+        if (cmp >= 0) {
+          status.className = 'update-status success';
+          status.innerHTML = `<strong>✓ 최신 버전을 사용하고 있습니다.</strong><br>현재 설치된 파일을 그대로 사용하시면 됩니다.`;
+        } else {
+          status.className = 'update-status warning';
+          status.innerHTML = `<strong>새로운 버전이 있습니다.</strong><br>기존 파일은 그대로 사용할 수 있으며, 원하실 때 최신 파일을 내려받아 교체하시면 됩니다.`;
+          const downloadUrl = info.downloadUrl || FALLBACK_DOWNLOAD_URL;
+          downloadBtn.dataset.url = downloadUrl;
+          downloadBtn.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.warn('Update check failed:', err);
+        status.className = 'update-status error';
+        status.innerHTML = `<strong>업데이트 서버에 연결할 수 없습니다.</strong><br>GitHub 업데이트 서버에 연결하지 못했습니다. 인터넷 연결 또는 학교·기관 네트워크의 GitHub 접속 가능 여부를 확인한 뒤 다시 시도해 주세요. 대진 추첨 기능에는 영향이 없습니다.`;
+        latestEl.textContent = '확인 실패';
+        releasedEl.textContent = '-';
+      } finally {
+        checkBtn.disabled = false;
+      }
+    }
+
+    function downloadLatestVersion() {
+      const url = $('downloadUpdateBtn').dataset.url;
+      if (!url) return;
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function resetAll() {
+      if (!confirm('새 대회를 시작할까요?\n\n현재 추첨이 완료된 대진은 「지난 대진 기록함」에 남고, 새 참가팀 입력 화면으로 초기화됩니다.')) return;
+      if (state.result) archiveCurrentDraw();
+      localStorage.removeItem(STORAGE_KEY);
+      state = makeInitialState(); selectedDivisionId = state.divisions[0].id; renderAll(); toast('새 교내대회를 시작했습니다. 종별과 팀 수를 새로 설정할 수 있습니다.');
+    }
+
+    async function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+        else await document.exitFullscreen();
+      } catch (e) { alert('현재 브라우저에서는 전체화면을 사용할 수 없습니다.'); }
+    }
+
+    $('divisionSetupBtn').addEventListener('click', openDivisionSetup);
+    $('addDivisionBtn').addEventListener('click', addDivisionSetupRow);
+    $('cancelDivisionSetupBtn').addEventListener('click', closeDivisionSetup);
+    $('applyDivisionSetupBtn').addEventListener('click', applyDivisionSetup);
+    $('divisionSetupModal').addEventListener('click', e => { if (e.target === $('divisionSetupModal')) closeDivisionSetup(); });
+
+    $('eventName').addEventListener('input', e => { state.eventName = e.target.value; saveState(); });
+    $('sportName').addEventListener('input', e => { state.sportName = e.target.value; saveState(); });
+    $('publicNumber').addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
+      state.publicNumber = e.target.value; saveState(); renderWorkflow(); updateControls();
+    });
+    $('numberProvider').addEventListener('input', e => { state.numberProvider = e.target.value; saveState(); });
+    $('lockBtn').addEventListener('click', lockRoster);
+    $('unlockBtn').addEventListener('click', unlockRoster);
+    $('drawBtn').addEventListener('click', openConfirmModal);
+    $('cancelDrawBtn').addEventListener('click', () => $('confirmModal').classList.add('hidden'));
+    $('finalCheck').addEventListener('change', e => $('startDrawBtn').disabled = !e.target.checked);
+    $('startDrawBtn').addEventListener('click', runPublicDraw);
+    $('copyBtn').addEventListener('click', copyResultText);
+    $('csvBtn').addEventListener('click', exportCsv);
+    $('certificateBtn').addEventListener('click', downloadCertificate);
+    $('xlsxBtn').addEventListener('click', exportXlsxBracket);
+    $('resetBtn').addEventListener('click', resetAll);
+    $('guideBtn').addEventListener('click', openGuideModal);
+    $('historyBtn').addEventListener('click', openHistoryModal);
+    $('updateBtn').addEventListener('click', openUpdateModal);
+    $('inquiryBtn').addEventListener('click', () => {
+      window.open('https://forms.gle/7gynFzshUz9uYE5k9', '_blank', 'noopener,noreferrer');
+    });
+    $('closeUpdateBtn').addEventListener('click', closeUpdateModal);
+    $('checkUpdateBtn').addEventListener('click', checkForUpdates);
+    $('downloadUpdateBtn').addEventListener('click', downloadLatestVersion);
+    $('updateModal').addEventListener('click', e => { if (e.target === $('updateModal')) closeUpdateModal(); });
+    $('closeGuideBtn').addEventListener('click', closeGuideModal);
+    $('guideModal').addEventListener('click', e => { if (e.target === $('guideModal')) closeGuideModal(); });
+    $('closeHistoryBtn').addEventListener('click', closeHistoryModal);
+    $('backupHistoryBtn').addEventListener('click', backupHistory);
+    $('restoreHistoryBtn').addEventListener('click', () => $('historyBackupFile').click());
+    $('restoreExcelBtn').addEventListener('click', () => $('historyExcelFile').click());
+    $('historyExcelFile').addEventListener('change', e => { const file = e.target.files?.[0]; if (file) importHistoryFromExcel(file); e.target.value = ''; });
+    $('historyBackupFile').addEventListener('change', e => { const file = e.target.files?.[0]; if (file) restoreHistoryBackup(file); e.target.value = ''; });
+    $('clearHistoryBtn').addEventListener('click', clearHistory);
+    $('historyModal').addEventListener('click', e => { if (e.target === $('historyModal')) closeHistoryModal(); });
+    $('fullscreenBtn').addEventListener('click', toggleFullscreen);
+    $('verifyBtn').addEventListener('click', () => $('verifyFile').click());
+    $('verifyFile').addEventListener('change', e => { const file = e.target.files?.[0]; if (file) verifyCertificate(file); e.target.value = ''; });
+    window.addEventListener('beforeprint', () => {
+      if (!document.body.classList.contains('print-preparing')) {
+        $('screenResult')?.classList.add('hidden');
+        $('printAllResults')?.classList.remove('hidden');
+        document.body.classList.add('print-preparing');
+        configurePrintSizing();
+        layoutBracketRounds();
+        drawBracketConnectors();
+        applyPrintFit();
+      }
+    });
+    window.addEventListener('afterprint', () => {
+      clearPrintFit();
+      $('printAllResults')?.classList.add('hidden');
+      $('screenResult')?.classList.remove('hidden');
+      scheduleBracketConnectors();
+    });
+    window.addEventListener('resize', () => { if (state.result) scheduleBracketConnectors(); });
+
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (!$('divisionSetupModal').classList.contains('hidden')) closeDivisionSetup();
+      else if (!$('guideModal').classList.contains('hidden')) closeGuideModal();
+      else if (!$('historyModal').classList.contains('hidden')) closeHistoryModal();
+      else if (!$('updateModal').classList.contains('hidden')) closeUpdateModal();
+    });
+
+    $('currentVersionBadge').textContent = `v${RELEASE_VERSION}`;
+    loadState();
+    renderAll();
+  
+    $('closeTimetableBtn').addEventListener('click', () => $('timetableModal').classList.add('hidden'));
+</script>
+</body>
+</html>

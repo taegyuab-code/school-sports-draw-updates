@@ -1,0 +1,9 @@
+{
+  "version": "1.4.5",
+  "releasedAt": "2026-08-21",
+  "notes": [
+    "종별 별도 진행 시 그룹 선택 셀을 그룹별 파스텔 색상으로 구분",
+    "그룹 변경 시 선택 셀 배경색도 즉시 변경"
+  ],
+  "downloadUrl": "https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html"
+}
