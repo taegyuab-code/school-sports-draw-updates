@@ -1,10 +1,9 @@
 {
-  "version": "1.4.17",
+  "version": "1.4.18",
   "releasedAt": "2026-08-21",
   "notes": [
-    "공개 추첨번호 항목에 작은 도움말(?) 버튼 추가",
-    "공개추첨번호의 공정성·재현성 목적과 사전 공유 권장 문구 표시",
-    "기존의 동일 명단·동일 번호 결과 보장 문구는 제거"
+    "공개 추첨번호 도움말 툴팁이 화면 왼쪽에서 잘리는 현상 수정",
+    "툴팁을 버튼 오른쪽 방향으로 펼치고 화면 너비에 맞게 반응형 처리"
   ],
   "downloadApiUrl": "https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main",
   "downloadUrl": "https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html"
