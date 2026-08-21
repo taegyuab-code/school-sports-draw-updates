@@ -242,6 +242,39 @@
     .schedule-mode-row { display:flex; gap:16px; flex-wrap:wrap; margin: 0 0 10px; padding: 9px 10px; background:#fff; border:1px solid var(--line); border-radius:11px; }
     .schedule-mode-row label { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:900; cursor:pointer; }
     .schedule-mode-row input { width:auto; accent-color:var(--primary); }
+    .schedule-settings-locked {
+      position:relative;
+      opacity:.60;
+      filter:grayscale(.28);
+      user-select:none;
+    }
+    .schedule-settings-locked::after {
+      content:'경기시간 · 코트 표시를 체크하면 설정할 수 있습니다.';
+      display:block;
+      margin-top:8px;
+      padding:7px 10px;
+      border:1px dashed #c7cfdb;
+      border-radius:9px;
+      background:#eef1f5;
+      color:#758093;
+      font-size:10px;
+      font-weight:800;
+      text-align:center;
+    }
+    .schedule-settings-locked input,
+    .schedule-settings-locked select,
+    .schedule-settings-locked button {
+      cursor:not-allowed !important;
+    }
+    .schedule-settings-locked .schedule-mode-row,
+    .schedule-settings-locked .notice,
+    .schedule-settings-locked .schedule-group-row,
+    .schedule-settings-locked .schedule-group-assignment-row,
+    .schedule-settings-locked .schedule-actions {
+      background:#eef1f5 !important;
+      border-color:#d5dbe4 !important;
+      box-shadow:none !important;
+    }
     .schedule-grid-4 { grid-template-columns: 150px 150px 120px minmax(0,1fr); }
     .schedule-division-list { display:grid; gap:8px; }
     .schedule-division-row { display:grid; grid-template-columns:minmax(110px,1fr) 135px 135px 100px; gap:8px; align-items:end; padding:10px; background:#fff; border:1px solid var(--line); border-radius:11px; }
@@ -639,7 +672,7 @@
         <p>종별과 팀 수를 자유롭게 설정하고, 참가팀 명단과 공개 추첨번호로 공정하게 대진을 추첨합니다.</p>
         <div class="local-data-note">※ 모든 데이터는 현재 사용 중인 PC의 브라우저에만 저장되며 다른 사용자와 공유되지 않습니다.</div>
         <div class="maker-credit">제작 <strong>부산백양고 신태규</strong></div>
-        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.12</span></div>
+        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.13</span></div>
       </div>
       <div class="hero-tools no-print">
         <button class="btn btn-soft" id="fullscreenBtn">전체화면</button>
@@ -845,7 +878,7 @@
       <div class="modal-body">
         <div class="update-status" id="updateStatus">최신 버전 정보를 확인하려면 아래 버튼을 눌러 주세요.</div>
         <div class="update-version-grid">
-          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.12</div>
+          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.13</div>
           <div class="k">최신 버전</div><div class="v" id="updateLatestVersion">확인 전</div>
           <div class="k">마지막 업데이트</div><div class="v" id="updateReleasedAt">확인 전</div>
           <div class="k">제작</div><div class="v">부산백양고 신태규</div>
@@ -857,6 +890,7 @@
         <div class="update-notes" style="margin-top:10px">
           <strong>최근 업데이트 이력</strong>
           <ul>
+            <li><strong>v1.4.13</strong> · 경기시간·코트 표시 기본 OFF, OFF 시 타임테이블 설정 영역을 회색 잠금 상태로 유지하고 도움말 문구 줄바꿈 적용</li>
             <li><strong>v1.4.12</strong> · 스마트 경기 타임테이블 기본 상태를 접힘으로 변경하고 제목 옆 도움말(?) 툴팁 추가</li>
             <li><strong>v1.4.11</strong> · 스마트 경기 타임테이블 영역에 작은 접기·펼치기 버튼 추가</li>
             <li><strong>v1.4.10</strong> · 전체 종별 통합 설정에서 결승 전 휴식·결승 코트 항목 제거</li>
@@ -921,7 +955,7 @@
     'use strict';
 
     const APP_VERSION = '4.0.0-SCHOOL';
-    const RELEASE_VERSION = '1.4.12';
+    const RELEASE_VERSION = '1.4.13';
     const UPDATE_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.json?ref=main';
     const LATEST_HTML_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main';
     const UPDATE_SCRIPT_URLS = [];
@@ -954,7 +988,7 @@
         lock: { locked: false, lockedAt: '', rosterHash: '', snapshot: null },
         publicNumber: '',
         numberProvider: '',
-        schedule: { mode: 'combined', showDetails: false, combined: { startTime: '09:00', durationMinutes: 15, courtCount: 1, preventConsecutive: true, minRestMinutes: 0, finalRestMinutes: 0, finalCourt: 1 }, perDivision: {}, divisionGroups: {}, groupSettings: {}, groupOrder: {} },
+        schedule: { mode: 'combined', showDetails: false, panelCollapsed: true, combined: { startTime: '09:00', durationMinutes: 15, courtCount: 1, preventConsecutive: true, minRestMinutes: 0, finalRestMinutes: 0, finalCourt: 1 }, perDivision: {}, divisionGroups: {}, groupSettings: {}, groupOrder: {} },
         result: null,
         audit: null
       };
@@ -2029,7 +2063,7 @@
         };
       }
       if (typeof state.schedule.showDetails !== 'boolean') state.schedule.showDetails = false;
-      if (typeof state.schedule.panelCollapsed !== 'boolean') state.schedule.panelCollapsed = false;
+      if (typeof state.schedule.panelCollapsed !== 'boolean') state.schedule.panelCollapsed = true;
       state.schedule.combined = cleanScheduleSetting(state.schedule.combined || {});
       state.schedule.perDivision ||= {};
       state.schedule.divisionGroups ||= {};
@@ -2525,7 +2559,7 @@
             <div class="schedule-title">⏱ 스마트 경기 타임테이블</div>
             <span class="schedule-help-wrap">
               <button type="button" class="schedule-help-btn" aria-label="타임테이블 사용 주의사항">?</button>
-              <span class="schedule-help-tooltip" role="tooltip">타임테이블은 참고용으로만 사용하시고 꼭 오류가 없는지 확인하시기 바랍니다.</span>
+              <span class="schedule-help-tooltip" role="tooltip">타임테이블은<br>참고용으로만 사용하시고<br>꼭 오류가 없는지 확인하시기 바랍니다.</span>
             </span>
           </div>
           <button type="button" class="schedule-collapse-btn" id="scheduleCollapseBtn" aria-expanded="${schedule.panelCollapsed ? 'false' : 'true'}">${schedule.panelCollapsed ? '펼치기 ▼' : '접기 ▲'}</button>
@@ -2533,9 +2567,9 @@
         <div id="schedulePanelBody" class="${schedule.panelCollapsed ? 'hidden' : ''}">
         <div class="schedule-mode-row">
           <label><input type="checkbox" id="scheduleShowDetails" ${schedule.showDetails === true ? 'checked' : ''}> 대진표에 경기시간 · 코트 표시</label>
-          <span class="schedule-note" style="padding:0;align-self:center">끄면 설정값은 유지되고 대진표·인쇄·CSV·엑셀에서만 표시가 숨겨집니다.</span>
+          <span class="schedule-note" style="padding:0;align-self:center">체크 해제 시 설정값은 유지되며 아래 설정 영역은 회색으로 잠기고, 대진표·인쇄·CSV·엑셀에서는 경기시간·코트 표시가 숨겨집니다.</span>
         </div>
-        <div id="scheduleSettingsArea" class="${schedule.showDetails === false ? 'hidden' : ''}">
+        <div id="scheduleSettingsArea" class="${schedule.showDetails === false ? 'schedule-settings-locked' : ''}" aria-disabled="${schedule.showDetails === false ? 'true' : 'false'}">
           <div class="schedule-mode-row">
             <label><input type="radio" name="scheduleMode" value="combined" ${mode==='combined'?'checked':''}> 전체 종별 통합 진행</label>
             <label><input type="radio" name="scheduleMode" value="separate" ${mode==='separate'?'checked':''}> 종별 별도 진행</label>
@@ -2577,6 +2611,14 @@
     function bindScheduleEvents() {
       const rerender = msg => { timetableCache = {key:'',bundle:null}; saveState(); renderResults(); if(msg) toast(msg); };
 
+      const currentSchedule = normalizeSchedule();
+      const scheduleSettingsArea = $('scheduleSettingsArea');
+      if (scheduleSettingsArea) {
+        scheduleSettingsArea.querySelectorAll('input, select, button').forEach(el => {
+          el.disabled = currentSchedule.showDetails === false;
+        });
+      }
+
       $('scheduleCollapseBtn')?.addEventListener('click', () => {
         const s = normalizeSchedule();
         s.panelCollapsed = !s.panelCollapsed;
@@ -2592,7 +2634,7 @@
 
       $('scheduleShowDetails')?.addEventListener('change', e => {
         normalizeSchedule().showDetails = Boolean(e.target.checked);
-        rerender(e.target.checked ? '경기시간·코트 표시를 켰습니다.' : '경기시간·코트 표시를 숨겼습니다.');
+        rerender(e.target.checked ? '경기시간·코트 표시와 타임테이블 설정을 활성화했습니다.' : '경기시간·코트 표시를 끄고 타임테이블 설정을 잠갔습니다.');
       });
       document.querySelectorAll('input[name="scheduleMode"]').forEach(el => el.addEventListener('change', e => {
         normalizeSchedule().mode = e.target.value; rerender('대회 진행 방식을 변경했습니다.');
