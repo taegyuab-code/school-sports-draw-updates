@@ -1,9 +1,9 @@
 {
-  "version": "1.4.18",
+  "version": "1.4.19",
   "releasedAt": "2026-08-21",
   "notes": [
-    "공개 추첨번호 도움말 툴팁이 화면 왼쪽에서 잘리는 현상 수정",
-    "툴팁을 버튼 오른쪽 방향으로 펼치고 화면 너비에 맞게 반응형 처리"
+    "공개 추첨번호 도움말을 화면 기준 고정형 툴팁으로 변경",
+    "도움말 위치를 화면 좌우·상하 경계에 맞춰 자동 계산하여 잘림 현상 방지"
   ],
   "downloadApiUrl": "https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main",
   "downloadUrl": "https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html"
