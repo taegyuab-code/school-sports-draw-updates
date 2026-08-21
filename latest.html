@@ -232,6 +232,8 @@
       z-index:99999;
       transition:opacity .12s ease, visibility .12s ease;
     }
+    .draw-help-wrap:hover .draw-help-tooltip,
+    .draw-help-wrap:focus-within .draw-help-tooltip,
     .draw-help-tooltip.is-visible {
       opacity:1;
       visibility:visible;
@@ -729,7 +731,7 @@
         <p>종별과 팀 수를 자유롭게 설정하고, 참가팀 명단과 공개 추첨번호로 공정하게 대진을 추첨합니다.</p>
         <div class="local-data-note">※ 모든 데이터는 현재 사용 중인 PC의 브라우저에만 저장되며 다른 사용자와 공유되지 않습니다.</div>
         <div class="maker-credit">제작 <strong>부산백양고 신태규</strong></div>
-        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.19</span></div>
+        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.20</span></div>
       </div>
       <div class="hero-tools no-print">
         <button class="btn btn-soft" id="fullscreenBtn">전체화면</button>
@@ -935,7 +937,7 @@
       <div class="modal-body">
         <div class="update-status" id="updateStatus">최신 버전 정보를 확인하려면 아래 버튼을 눌러 주세요.</div>
         <div class="update-version-grid">
-          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.19</div>
+          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.20</div>
           <div class="k">최신 버전</div><div class="v" id="updateLatestVersion">확인 전</div>
           <div class="k">마지막 업데이트</div><div class="v" id="updateReleasedAt">확인 전</div>
           <div class="k">제작</div><div class="v">부산백양고 신태규</div>
@@ -947,6 +949,7 @@
         <div class="update-notes" style="margin-top:10px">
           <strong>최근 업데이트 이력</strong>
           <ul>
+            <li><strong>v1.4.20</strong> · 공개 추첨번호 도움말 표시 이벤트를 안정화하여 마우스 오버 시 확실히 노출되도록 수정</li>
             <li><strong>v1.4.19</strong> · 공개 추첨번호 도움말을 화면 기준 자동 위치 방식으로 변경하여 좌우 잘림 현상 해결</li>
             <li><strong>v1.4.18</strong> · 공개 추첨번호 도움말 툴팁이 화면 밖으로 잘리지 않도록 위치와 너비 조정</li>
             <li><strong>v1.4.17</strong> · 공개 추첨번호 항목에 공정성·재현성 목적을 설명하는 도움말(?) 추가</li>
@@ -1018,7 +1021,7 @@
     'use strict';
 
     const APP_VERSION = '4.0.0-SCHOOL';
-    const RELEASE_VERSION = '1.4.19';
+    const RELEASE_VERSION = '1.4.20';
     const UPDATE_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.json?ref=main';
     const LATEST_HTML_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main';
     const UPDATE_SCRIPT_URLS = [];
@@ -2663,46 +2666,77 @@
       </div>`;
     }
 
+    function positionDrawHelpTooltip(btn) {
+      const wrap = btn?.closest('.draw-help-wrap');
+      const tip = wrap?.querySelector('.draw-help-tooltip');
+      if (!btn || !tip) return;
+
+      // 먼저 보이게 한 뒤 실제 크기를 측정한다.
+      tip.classList.add('is-visible');
+      tip.style.left = '12px';
+      tip.style.top = '12px';
+
+      requestAnimationFrame(() => {
+        const rect = btn.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        const margin = 12;
+        const gap = 8;
+
+        let left = rect.left;
+        if (left + tipRect.width > window.innerWidth - margin) {
+          left = window.innerWidth - tipRect.width - margin;
+        }
+        left = Math.max(margin, left);
+
+        let top = rect.bottom + gap;
+        if (top + tipRect.height > window.innerHeight - margin) {
+          top = rect.top - tipRect.height - gap;
+        }
+        top = Math.max(margin, top);
+
+        tip.style.left = `${Math.round(left)}px`;
+        tip.style.top = `${Math.round(top)}px`;
+      });
+    }
+
+    function hideDrawHelpTooltip(btn) {
+      const tip = btn?.closest('.draw-help-wrap')?.querySelector('.draw-help-tooltip');
+      tip?.classList.remove('is-visible');
+    }
+
     function bindDrawHelpTooltips() {
-      document.querySelectorAll('.draw-help-wrap').forEach(wrap => {
-        const btn = wrap.querySelector('.draw-help-btn');
-        const tip = wrap.querySelector('.draw-help-tooltip');
-        if (!btn || !tip || btn.dataset.tooltipBound === '1') return;
-        btn.dataset.tooltipBound = '1';
+      if (document.body.dataset.drawHelpBound === '1') return;
+      document.body.dataset.drawHelpBound = '1';
 
-        const show = () => {
-          tip.classList.add('is-visible');
-          tip.style.left = '12px';
-          tip.style.top = '12px';
+      document.addEventListener('mouseover', e => {
+        const btn = e.target.closest?.('.draw-help-btn');
+        if (btn) positionDrawHelpTooltip(btn);
+      });
 
-          requestAnimationFrame(() => {
-            const rect = btn.getBoundingClientRect();
-            const tipRect = tip.getBoundingClientRect();
-            const margin = 12;
-            const gap = 8;
+      document.addEventListener('mouseout', e => {
+        const btn = e.target.closest?.('.draw-help-btn');
+        if (!btn) return;
+        const to = e.relatedTarget;
+        if (to && btn.closest('.draw-help-wrap')?.contains(to)) return;
+        hideDrawHelpTooltip(btn);
+      });
 
-            let left = rect.left;
-            left = Math.max(margin, Math.min(left, window.innerWidth - tipRect.width - margin));
+      document.addEventListener('focusin', e => {
+        const btn = e.target.closest?.('.draw-help-btn');
+        if (btn) positionDrawHelpTooltip(btn);
+      });
 
-            let top = rect.bottom + gap;
-            if (top + tipRect.height > window.innerHeight - margin) {
-              top = rect.top - tipRect.height - gap;
-            }
-            top = Math.max(margin, Math.min(top, window.innerHeight - tipRect.height - margin));
+      document.addEventListener('focusout', e => {
+        const btn = e.target.closest?.('.draw-help-btn');
+        if (btn) hideDrawHelpTooltip(btn);
+      });
 
-            tip.style.left = `${Math.round(left)}px`;
-            tip.style.top = `${Math.round(top)}px`;
-          });
-        };
+      window.addEventListener('scroll', () => {
+        document.querySelectorAll('.draw-help-tooltip.is-visible').forEach(t => t.classList.remove('is-visible'));
+      }, true);
 
-        const hide = () => tip.classList.remove('is-visible');
-
-        btn.addEventListener('mouseenter', show);
-        btn.addEventListener('mouseleave', hide);
-        btn.addEventListener('focus', show);
-        btn.addEventListener('blur', hide);
-        window.addEventListener('scroll', hide, true);
-        window.addEventListener('resize', hide);
+      window.addEventListener('resize', () => {
+        document.querySelectorAll('.draw-help-tooltip.is-visible').forEach(t => t.classList.remove('is-visible'));
       });
     }
 
@@ -3778,6 +3812,8 @@
     renderAll();
   
     $('closeTimetableBtn').addEventListener('click', () => $('timetableModal').classList.add('hidden'));
+
+    bindDrawHelpTooltips();
 </script>
 </body>
 </html>
