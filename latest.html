@@ -223,20 +223,12 @@
       min-width:94px;
       padding:6px 28px 6px 12px;
       border-radius:999px;
-      border:1px solid #d6dce6;
-      background:#f7f8fa;
-      color:#596273;
+      border:2px solid #d6dce6;
       font-size:11px;
-      font-weight:850;
+      font-weight:950;
       text-align:center;
       transition:background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
-    }
-    .division-priority-select.priority-first {
-      background:#eef3ff;
-      border-color:#b8c8f0;
-      color:#294f9c;
-      font-weight:950;
-      box-shadow:0 0 0 1px rgba(36,87,230,.04);
+      box-shadow:0 1px 3px rgba(18,32,51,.08);
     }
     .schedule-group-settings { display:grid; gap:8px; margin-top:10px; }
     .schedule-group-row { display:grid; grid-template-columns:minmax(120px,1.15fr) repeat(6,minmax(92px,.7fr)); gap:8px; align-items:end; padding:10px; background:#fff; border:1px solid #cbd6f2; border-radius:11px; }
@@ -613,7 +605,7 @@
         <p>종별과 팀 수를 자유롭게 설정하고, 참가팀 명단과 공개 추첨번호로 공정하게 대진을 추첨합니다.</p>
         <div class="local-data-note">※ 모든 데이터는 현재 사용 중인 PC의 브라우저에만 저장되며 다른 사용자와 공유되지 않습니다.</div>
         <div class="maker-credit">제작 <strong>부산백양고 신태규</strong></div>
-        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.7</span></div>
+        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.9</span></div>
       </div>
       <div class="hero-tools no-print">
         <button class="btn btn-soft" id="fullscreenBtn">전체화면</button>
@@ -819,7 +811,7 @@
       <div class="modal-body">
         <div class="update-status" id="updateStatus">최신 버전 정보를 확인하려면 아래 버튼을 눌러 주세요.</div>
         <div class="update-version-grid">
-          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.7</div>
+          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.9</div>
           <div class="k">최신 버전</div><div class="v" id="updateLatestVersion">확인 전</div>
           <div class="k">마지막 업데이트</div><div class="v" id="updateReleasedAt">확인 전</div>
           <div class="k">제작</div><div class="v">부산백양고 신태규</div>
@@ -831,6 +823,8 @@
         <div class="update-notes" style="margin-top:10px">
           <strong>최근 업데이트 이력</strong>
           <ul>
+            <li><strong>v1.4.9</strong> · 종별 진행 순위를 1순위부터 순차적으로 서로 다른 색상으로 표시해 우선순위 가독성 강화</li>
+            <li><strong>v1.4.8</strong> · 최신버전 조회·다운로드를 GitHub Raw 대신 GitHub API 방식으로 변경하여 캐시 문제 방지</li>
             <li><strong>v1.4.7</strong> · 종별 진행 순위를 작은 캡슐형 배지 스타일로 정리하고 1순위만 은은하게 강조</li>
             <li><strong>v1.4.6</strong> · 최신버전 다운로드 시 Raw 소스 화면 대신 HTML 파일로 직접 저장되도록 수정</li>
             <li><strong>v1.4.5</strong> · 종별 별도 진행 시 그룹 선택 셀을 그룹별 파스텔 색상으로 구분</li>
@@ -890,10 +884,11 @@
     'use strict';
 
     const APP_VERSION = '4.0.0-SCHOOL';
-    const RELEASE_VERSION = '1.4.7';
-    const UPDATE_API_URL = 'https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.json';
+    const RELEASE_VERSION = '1.4.9';
+    const UPDATE_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.json?ref=main';
+    const LATEST_HTML_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main';
     const UPDATE_SCRIPT_URLS = [];
-    const FALLBACK_DOWNLOAD_URL = 'https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html';
+    const FALLBACK_DOWNLOAD_URL = LATEST_HTML_API_URL;
     const STORAGE_KEY = 'schoolSportsClubDrawV1';
     const HISTORY_KEY = 'schoolSportsClubDrawHistoryV1';
     const HISTORY_LIMIT = 30;
@@ -2326,6 +2321,27 @@
       return `background:${c.bg};border-color:${c.border};color:${c.text};`;
     }
 
+    const PRIORITY_COLOR_PALETTE = [
+      { bg:'#ffe7e7', border:'#e85b5b', text:'#9d1f1f' },  // 1순위: 빨강
+      { bg:'#fff0dc', border:'#ef923e', text:'#9a4f0b' },  // 2순위: 주황
+      { bg:'#fff8cf', border:'#d8b72f', text:'#766000' },  // 3순위: 노랑
+      { bg:'#e8f7df', border:'#73b84b', text:'#326d16' },  // 4순위: 초록
+      { bg:'#dff6f5', border:'#42aaa6', text:'#176966' },  // 5순위: 청록
+      { bg:'#e5f0ff', border:'#4f8fdc', text:'#24558f' },  // 6순위: 파랑
+      { bg:'#ece8ff', border:'#7769dc', text:'#433797' },  // 7순위: 남보라
+      { bg:'#f3e5ff', border:'#a465d0', text:'#67328d' },  // 8순위: 보라
+      { bg:'#ffe5f3', border:'#d85a9d', text:'#8e245f' },  // 9순위: 분홍
+      { bg:'#f0ebe5', border:'#9b7b5e', text:'#654b34' },  // 10순위: 갈색
+      { bg:'#e8edf2', border:'#73849a', text:'#435266' },  // 11순위: 청회색
+      { bg:'#eff4da', border:'#93aa43', text:'#56670f' }   // 12순위: 올리브
+    ];
+
+    function priorityColorStyle(rank) {
+      const n = Math.max(1, Number(rank) || 1);
+      const c = PRIORITY_COLOR_PALETTE[(n - 1) % PRIORITY_COLOR_PALETTE.length];
+      return `background:${c.bg};border-color:${c.border};color:${c.text};`;
+    }
+
     function divisionTimetableSummaries(bundle) {
       const rows = [];
       state.result.divisions.forEach(d => {
@@ -2418,11 +2434,11 @@
         const order = schedule.groupOrder[selectedGroup] || [];
         const members = divisions.filter(x => schedule.divisionGroups[x.divisionId] === selectedGroup);
         const currentRank = Math.max(0, order.indexOf(d.divisionId)) + 1;
-        const priorityOptions = members.map((_, i) => `<option value="${i + 1}" ${i + 1 === currentRank ? 'selected' : ''}>${i + 1}순위</option>`).join('');
+        const priorityOptions = members.map((_, i) => `<option value="${i + 1}" style="${priorityColorStyle(i + 1)}" ${i + 1 === currentRank ? 'selected' : ''}>${i + 1}순위</option>`).join('');
         return `<div class="schedule-group-assignment-row" data-division-id="${escapeHtml(d.divisionId)}">
           <strong>${escapeHtml(d.divisionName)}</strong>
           <select class="division-group-select" style="${groupColorStyle(selectedGroup)}">${options}</select>
-          <select class="division-priority-select ${currentRank === 1 ? 'priority-first' : ''}" aria-label="${escapeHtml(d.divisionName)} 종별 진행 순위">${priorityOptions}</select>
+          <select class="division-priority-select" style="${priorityColorStyle(currentRank)}" aria-label="${escapeHtml(d.divisionName)} 종별 진행 순위">${priorityOptions}</select>
         </div>`;
       }).join('');
 
@@ -3293,25 +3309,49 @@
       });
     }
 
-    async function fetchUpdateInfoJson() {
+    function decodeGithubBase64Utf8(base64Text) {
+      const binary = atob(String(base64Text || '').replace(/\s/g, ''));
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return new TextDecoder('utf-8').decode(bytes);
+    }
+
+    async function fetchGithubFileText(url, timeoutMs = 7000) {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 7000);
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
-        const sep = UPDATE_API_URL.includes('?') ? '&' : '?';
-        const response = await fetch(`${UPDATE_API_URL}${sep}t=${Date.now()}`, {
+        const sep = url.includes('?') ? '&' : '?';
+        const response = await fetch(`${url}${sep}_=${Date.now()}`, {
           method: 'GET',
           mode: 'cors',
           cache: 'no-store',
-          headers: { 'Accept': 'application/json' },
+          headers: {
+            'Accept': 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28'
+          },
           signal: controller.signal
         });
-        if (!response.ok) throw new Error(`업데이트 서버 HTTP ${response.status}`);
-        const info = await response.json();
-        if (!info || !info.version) throw new Error('버전 정보 형식이 올바르지 않습니다.');
-        return info;
+        if (!response.ok) throw new Error(`GitHub API HTTP ${response.status}`);
+        const payload = await response.json();
+        if (!payload || payload.type !== 'file' || payload.encoding !== 'base64' || !payload.content) {
+          throw new Error('GitHub 파일 응답 형식이 올바르지 않습니다.');
+        }
+        return decodeGithubBase64Utf8(payload.content);
       } finally {
         clearTimeout(timer);
       }
+    }
+
+    async function fetchUpdateInfoJson() {
+      const jsonText = await fetchGithubFileText(UPDATE_API_URL, 7000);
+      let info;
+      try {
+        info = JSON.parse(jsonText);
+      } catch (_) {
+        throw new Error('최신버전 정보 JSON을 해석할 수 없습니다.');
+      }
+      if (!info || !info.version) throw new Error('버전 정보 형식이 올바르지 않습니다.');
+      return info;
     }
 
     async function loadRemoteUpdateInfo() {
@@ -3375,7 +3415,7 @@
         } else {
           status.className = 'update-status warning';
           status.innerHTML = `<strong>새로운 버전이 있습니다.</strong><br>기존 파일은 그대로 사용할 수 있으며, 원하실 때 최신 파일을 내려받아 교체하시면 됩니다.`;
-          const downloadUrl = info.downloadUrl || FALLBACK_DOWNLOAD_URL;
+          const downloadUrl = info.downloadApiUrl || LATEST_HTML_API_URL || info.downloadUrl || FALLBACK_DOWNLOAD_URL;
           downloadBtn.dataset.url = downloadUrl;
           downloadBtn.dataset.version = latest;
           downloadBtn.classList.remove('hidden');
@@ -3402,14 +3442,19 @@
       btn.textContent = '다운로드 준비 중...';
 
       try {
-        const sep = url.includes('?') ? '&' : '?';
-        const response = await fetch(`${url}${sep}t=${Date.now()}`, {
-          cache: 'no-store',
-          mode: 'cors'
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        let htmlText;
+        if (/^https:\/\/api\.github\.com\//i.test(url)) {
+          htmlText = await fetchGithubFileText(url, 12000);
+        } else {
+          const sep = url.includes('?') ? '&' : '?';
+          const response = await fetch(`${url}${sep}_=${Date.now()}`, {
+            cache: 'no-store',
+            mode: 'cors'
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          htmlText = await response.text();
+        }
 
-        const htmlText = await response.text();
         if (!/^\s*<!doctype html/i.test(htmlText) && !/^\s*<html/i.test(htmlText)) {
           throw new Error('다운로드한 파일이 HTML 형식이 아닙니다.');
         }
