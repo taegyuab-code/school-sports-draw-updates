@@ -216,6 +216,7 @@
     .schedule-group-assignment { display:grid; gap:8px; margin-bottom:10px; }
     .schedule-group-assignment-row { display:grid; grid-template-columns:minmax(120px,1fr) 180px 120px; gap:8px; align-items:center; padding:9px 10px; background:#fff; border:1px solid var(--line); border-radius:11px; }
     .schedule-group-assignment-row strong { font-size:12px; }
+    .division-group-select { font-weight:900; transition:background-color .15s ease, border-color .15s ease, color .15s ease; }
     .schedule-group-settings { display:grid; gap:8px; margin-top:10px; }
     .schedule-group-row { display:grid; grid-template-columns:minmax(120px,1.15fr) repeat(6,minmax(92px,.7fr)); gap:8px; align-items:end; padding:10px; background:#fff; border:1px solid #cbd6f2; border-radius:11px; }
     .schedule-group-row > div:first-child { align-self:center; }
@@ -591,7 +592,7 @@
         <p>종별과 팀 수를 자유롭게 설정하고, 참가팀 명단과 공개 추첨번호로 공정하게 대진을 추첨합니다.</p>
         <div class="local-data-note">※ 모든 데이터는 현재 사용 중인 PC의 브라우저에만 저장되며 다른 사용자와 공유되지 않습니다.</div>
         <div class="maker-credit">제작 <strong>부산백양고 신태규</strong></div>
-        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.4</span></div>
+        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.5</span></div>
       </div>
       <div class="hero-tools no-print">
         <button class="btn btn-soft" id="fullscreenBtn">전체화면</button>
@@ -797,7 +798,7 @@
       <div class="modal-body">
         <div class="update-status" id="updateStatus">최신 버전 정보를 확인하려면 아래 버튼을 눌러 주세요.</div>
         <div class="update-version-grid">
-          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.4</div>
+          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.5</div>
           <div class="k">최신 버전</div><div class="v" id="updateLatestVersion">확인 전</div>
           <div class="k">마지막 업데이트</div><div class="v" id="updateReleasedAt">확인 전</div>
           <div class="k">제작</div><div class="v">부산백양고 신태규</div>
@@ -809,6 +810,7 @@
         <div class="update-notes" style="margin-top:10px">
           <strong>최근 업데이트 이력</strong>
           <ul>
+            <li><strong>v1.4.5</strong> · 종별 별도 진행 시 그룹 선택 셀을 그룹별 파스텔 색상으로 구분</li>
             <li><strong>v1.4.4</strong> · 최신버전 확인 및 다운로드 서버를 GitHub 정적 저장소 방식으로 전환</li>
             <li><strong>v1.4.3</strong> · 최신버전 확인 서버 연결 구조 안정화 및 새 전용 API 적용</li>
             <li><strong>v1.4.2</strong> · 초기 기본값을 경기시간·코트 표시 OFF, 최소 휴식 0분으로 변경</li>
@@ -865,7 +867,7 @@
     'use strict';
 
     const APP_VERSION = '4.0.0-SCHOOL';
-    const RELEASE_VERSION = '1.4.4';
+    const RELEASE_VERSION = '1.4.5';
     const UPDATE_API_URL = 'https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.json';
     const UPDATE_SCRIPT_URLS = [];
     const FALLBACK_DOWNLOAD_URL = 'https://raw.githubusercontent.com/taegyuab-code/school-sports-draw-updates/main/latest.html';
@@ -2280,6 +2282,27 @@
       return n ? `그룹 ${n}` : String(groupId || '그룹');
     }
 
+    const GROUP_COLOR_PALETTE = [
+      { bg:'#e8f0ff', border:'#9bb7f5', text:'#244a9b' },
+      { bg:'#e9f8ef', border:'#9ed3b0', text:'#17653a' },
+      { bg:'#fff3df', border:'#e8c38a', text:'#865713' },
+      { bg:'#f5eaff', border:'#c8a8e8', text:'#673691' },
+      { bg:'#ffe9ed', border:'#e8a6b2', text:'#913047' },
+      { bg:'#e7f8f8', border:'#91cdcf', text:'#17686b' },
+      { bg:'#fff8d9', border:'#dfca75', text:'#75600b' },
+      { bg:'#edf0f4', border:'#b7c0cc', text:'#455263' },
+      { bg:'#e9f3ff', border:'#9fc2e7', text:'#285c8d' },
+      { bg:'#f8ecdf', border:'#d7b38f', text:'#79502e' },
+      { bg:'#eef7e5', border:'#b4d397', text:'#476e24' },
+      { bg:'#fcebf7', border:'#d8acd0', text:'#7f3971' }
+    ];
+
+    function groupColorStyle(groupId) {
+      const n = Number(String(groupId || '').match(/group_(\d+)/)?.[1] || 1);
+      const c = GROUP_COLOR_PALETTE[(Math.max(1, n) - 1) % GROUP_COLOR_PALETTE.length];
+      return `background:${c.bg};border-color:${c.border};color:${c.text};`;
+    }
+
     function divisionTimetableSummaries(bundle) {
       const rows = [];
       state.result.divisions.forEach(d => {
@@ -2368,14 +2391,14 @@
 
       const assignmentRows = divisions.map(d => {
         const selectedGroup = schedule.divisionGroups[d.divisionId];
-        const options = groupOptions.map(g => `<option value="${g}" ${g === selectedGroup ? 'selected' : ''}>${escapeHtml(groupLabel(g))}</option>`).join('');
+        const options = groupOptions.map(g => `<option value="${g}" style="${groupColorStyle(g)}" ${g === selectedGroup ? 'selected' : ''}>${escapeHtml(groupLabel(g))}</option>`).join('');
         const order = schedule.groupOrder[selectedGroup] || [];
         const members = divisions.filter(x => schedule.divisionGroups[x.divisionId] === selectedGroup);
         const currentRank = Math.max(0, order.indexOf(d.divisionId)) + 1;
         const priorityOptions = members.map((_, i) => `<option value="${i + 1}" ${i + 1 === currentRank ? 'selected' : ''}>${i + 1}순위</option>`).join('');
         return `<div class="schedule-group-assignment-row" data-division-id="${escapeHtml(d.divisionId)}">
           <strong>${escapeHtml(d.divisionName)}</strong>
-          <select class="division-group-select">${options}</select>
+          <select class="division-group-select" style="${groupColorStyle(selectedGroup)}">${options}</select>
           <select class="division-priority-select">${priorityOptions}</select>
         </div>`;
       }).join('');
