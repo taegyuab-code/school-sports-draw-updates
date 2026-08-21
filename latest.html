@@ -201,7 +201,41 @@
     .result-print-btn { min-width: 138px; font-weight: 900; box-shadow: 0 8px 18px rgba(37,99,235,.14); }
 
     .schedule-panel { margin: 0 0 13px; padding: 12px 13px; border: 1px solid #cbd6f2; border-radius: 14px; background: #f7f9ff; }
-    .schedule-title { font-size: 13px; font-weight: 950; margin-bottom: 8px; }
+    .schedule-title { font-size: 13px; font-weight: 950; margin: 0; }
+    .schedule-title-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .schedule-title-left { display:flex; align-items:center; gap:6px; min-width:0; }
+    .schedule-help-wrap { position:relative; display:inline-flex; align-items:center; }
+    .schedule-help-btn {
+      width:20px; height:20px; padding:0;
+      border:1px solid #c8d1df; border-radius:50%;
+      background:#fff; color:#5b667a;
+      font-size:11px; font-weight:950; line-height:18px; text-align:center;
+      cursor:help;
+    }
+    .schedule-help-tooltip {
+      position:absolute;
+      left:50%; top:calc(100% + 8px);
+      transform:translateX(-50%);
+      width:300px; max-width:min(300px, 80vw);
+      padding:9px 10px;
+      border:1px solid #d6dde8; border-radius:10px;
+      background:#172033; color:#fff;
+      font-size:11px; font-weight:700; line-height:1.5;
+      box-shadow:0 8px 22px rgba(23,32,51,.18);
+      opacity:0; visibility:hidden; pointer-events:none;
+      z-index:30;
+      transition:opacity .12s ease, visibility .12s ease;
+    }
+    .schedule-help-wrap:hover .schedule-help-tooltip,
+    .schedule-help-wrap:focus-within .schedule-help-tooltip {
+      opacity:1; visibility:visible;
+    }
+    .schedule-collapse-btn {
+      flex:0 0 auto; padding:4px 9px; min-height:25px;
+      border:1px solid #cfd7e5; border-radius:999px; background:#fff; color:#536078;
+      font-size:10px; font-weight:900; line-height:1; cursor:pointer;
+    }
+    .schedule-collapse-btn:hover { background:#f4f6fa; border-color:#b9c4d7; }
     .schedule-grid { display: grid; grid-template-columns: 150px 150px minmax(0,1fr); gap: 9px; align-items: end; }
     .schedule-grid .field { margin: 0; }
     .schedule-note { color: var(--muted); font-size: 10px; line-height: 1.5; padding-bottom: 9px; }
@@ -605,7 +639,7 @@
         <p>종별과 팀 수를 자유롭게 설정하고, 참가팀 명단과 공개 추첨번호로 공정하게 대진을 추첨합니다.</p>
         <div class="local-data-note">※ 모든 데이터는 현재 사용 중인 PC의 브라우저에만 저장되며 다른 사용자와 공유되지 않습니다.</div>
         <div class="maker-credit">제작 <strong>부산백양고 신태규</strong></div>
-        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.9</span></div>
+        <div class="version-line"><span>현재 버전</span><span class="version-badge" id="currentVersionBadge">v1.4.12</span></div>
       </div>
       <div class="hero-tools no-print">
         <button class="btn btn-soft" id="fullscreenBtn">전체화면</button>
@@ -811,7 +845,7 @@
       <div class="modal-body">
         <div class="update-status" id="updateStatus">최신 버전 정보를 확인하려면 아래 버튼을 눌러 주세요.</div>
         <div class="update-version-grid">
-          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.9</div>
+          <div class="k">현재 버전</div><div class="v" id="updateCurrentVersion">v1.4.12</div>
           <div class="k">최신 버전</div><div class="v" id="updateLatestVersion">확인 전</div>
           <div class="k">마지막 업데이트</div><div class="v" id="updateReleasedAt">확인 전</div>
           <div class="k">제작</div><div class="v">부산백양고 신태규</div>
@@ -823,6 +857,9 @@
         <div class="update-notes" style="margin-top:10px">
           <strong>최근 업데이트 이력</strong>
           <ul>
+            <li><strong>v1.4.12</strong> · 스마트 경기 타임테이블 기본 상태를 접힘으로 변경하고 제목 옆 도움말(?) 툴팁 추가</li>
+            <li><strong>v1.4.11</strong> · 스마트 경기 타임테이블 영역에 작은 접기·펼치기 버튼 추가</li>
+            <li><strong>v1.4.10</strong> · 전체 종별 통합 설정에서 결승 전 휴식·결승 코트 항목 제거</li>
             <li><strong>v1.4.9</strong> · 종별 진행 순위를 1순위부터 순차적으로 서로 다른 색상으로 표시해 우선순위 가독성 강화</li>
             <li><strong>v1.4.8</strong> · 최신버전 조회·다운로드를 GitHub Raw 대신 GitHub API 방식으로 변경하여 캐시 문제 방지</li>
             <li><strong>v1.4.7</strong> · 종별 진행 순위를 작은 캡슐형 배지 스타일로 정리하고 1순위만 은은하게 강조</li>
@@ -884,7 +921,7 @@
     'use strict';
 
     const APP_VERSION = '4.0.0-SCHOOL';
-    const RELEASE_VERSION = '1.4.9';
+    const RELEASE_VERSION = '1.4.12';
     const UPDATE_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.json?ref=main';
     const LATEST_HTML_API_URL = 'https://api.github.com/repos/taegyuab-code/school-sports-draw-updates/contents/latest.html?ref=main';
     const UPDATE_SCRIPT_URLS = [];
@@ -1983,6 +2020,7 @@
         state.schedule = {
           mode: 'combined',
           showDetails: legacy?.showDetails === true,
+          panelCollapsed: true,
           combined: {
             startTime: legacy?.startTime || '09:00', durationMinutes: legacy?.durationMinutes || 15, courtCount: 1,
             preventConsecutive: true, minRestMinutes: 0, finalRestMinutes: 0, finalCourt: 1
@@ -1991,6 +2029,7 @@
         };
       }
       if (typeof state.schedule.showDetails !== 'boolean') state.schedule.showDetails = false;
+      if (typeof state.schedule.panelCollapsed !== 'boolean') state.schedule.panelCollapsed = false;
       state.schedule.combined = cleanScheduleSetting(state.schedule.combined || {});
       state.schedule.perDivision ||= {};
       state.schedule.divisionGroups ||= {};
@@ -2103,8 +2142,12 @@
       return earliest;
     }
 
-    function scheduleGroupSmart(divisions, setting, order, groupId) {
+    function scheduleGroupSmart(divisions, setting, order, groupId, useFinalOptions=true) {
       const cfg = cleanScheduleSetting(setting);
+      if (!useFinalOptions) {
+        cfg.finalRestMinutes = 0;
+        cfg.finalCourt = 0;
+      }
       const [h, m] = cfg.startTime.split(':').map(Number);
       const base = h * 60 + m;
       const orderIndex = new Map((order || []).map((id, i) => [id, i]));
@@ -2160,7 +2203,7 @@
 
         for (const item of assignOrder) {
           let court = null;
-          if (item.isFinal && freeCourts.has(cfg.finalCourt)) court = cfg.finalCourt;
+          if (item.isFinal && cfg.finalCourt > 0 && freeCourts.has(cfg.finalCourt)) court = cfg.finalCourt;
           else if (item.isSemi) {
             court = [1,2].find(c => freeCourts.has(c)) || null;
           }
@@ -2264,7 +2307,7 @@
       } else {
         const divisions = state.result.divisions;
         const order = divisions.map(d => d.divisionId);
-        const bundle = scheduleGroupSmart(divisions, schedule.combined, order, 'combined');
+        const bundle = scheduleGroupSmart(divisions, schedule.combined, order, 'combined', false);
         bundle.errors = validateGroupSchedule(bundle);
         groups.push(bundle);
         bundle.map.forEach((v,k) => allMap.set(k,v));
@@ -2445,13 +2488,14 @@
       const usedGroups = [...new Set(divisions.map(d => schedule.divisionGroups[d.divisionId]))]
         .sort((a,b) => Number((a.match(/\d+/)||[999])[0]) - Number((b.match(/\d+/)||[999])[0]));
 
-      const settingFields = (v, prefix='') => `
+      const settingFields = (v, prefix='', includeFinalOptions=true) => `
         <div class="field"><label>시작시간</label><input class="${prefix}start" type="time" value="${escapeHtml(v.startTime)}"></div>
         <div class="field"><label>소요시간(분)</label><input class="${prefix}duration" type="number" min="1" max="240" value="${v.durationMinutes}"></div>
         <div class="field"><label>코트 수</label><input class="${prefix}courts" type="number" min="1" max="20" value="${v.courtCount}"></div>
         <div class="field"><label>최소 휴식(분)</label><input class="${prefix}rest" type="number" min="0" max="240" value="${v.minRestMinutes}" ${v.preventConsecutive?'':'disabled'}></div>
+        ${includeFinalOptions ? `
         <div class="field"><label>결승 전 휴식(분)</label><input class="${prefix}final-rest" type="number" min="0" max="240" value="${v.finalRestMinutes}" ${v.preventConsecutive?'':'disabled'}></div>
-        <div class="field"><label>결승 코트</label><input class="${prefix}final-court" type="number" min="1" max="${v.courtCount}" value="${v.finalCourt}"></div>`;
+        <div class="field"><label>결승 코트</label><input class="${prefix}final-court" type="number" min="1" max="${v.courtCount}" value="${v.finalCourt}"></div>` : ''}`;
 
       const groupRows = usedGroups.map(groupId => {
         const members = divisions.filter(d => schedule.divisionGroups[d.divisionId] === groupId);
@@ -2476,7 +2520,17 @@
       const validation = timetableBundle().errors || [];
 
       return `<div class="schedule-panel no-print">
-        <div class="schedule-title">⏱ 스마트 경기 타임테이블</div>
+        <div class="schedule-title-row">
+          <div class="schedule-title-left">
+            <div class="schedule-title">⏱ 스마트 경기 타임테이블</div>
+            <span class="schedule-help-wrap">
+              <button type="button" class="schedule-help-btn" aria-label="타임테이블 사용 주의사항">?</button>
+              <span class="schedule-help-tooltip" role="tooltip">타임테이블은 참고용으로만 사용하시고 꼭 오류가 없는지 확인하시기 바랍니다.</span>
+            </span>
+          </div>
+          <button type="button" class="schedule-collapse-btn" id="scheduleCollapseBtn" aria-expanded="${schedule.panelCollapsed ? 'false' : 'true'}">${schedule.panelCollapsed ? '펼치기 ▼' : '접기 ▲'}</button>
+        </div>
+        <div id="schedulePanelBody" class="${schedule.panelCollapsed ? 'hidden' : ''}">
         <div class="schedule-mode-row">
           <label><input type="checkbox" id="scheduleShowDetails" ${schedule.showDetails === true ? 'checked' : ''}> 대진표에 경기시간 · 코트 표시</label>
           <span class="schedule-note" style="padding:0;align-self:center">끄면 설정값은 유지되고 대진표·인쇄·CSV·엑셀에서만 표시가 숨겨집니다.</span>
@@ -2501,14 +2555,14 @@
                   <span class="toggle-help">ON: 앞 경기를 치른 팀이 설정한 최소 휴식시간을 확보한 뒤 다음 경기를 배정합니다. OFF: 선행경기 종료 후 별도 휴식시간을 강제하지 않습니다.</span>
                 </div>
               </div>
-              ${settingFields(combined,'combined-')}
+              ${settingFields(combined,'combined-', false)}
             </div>
           </div>
           <div id="separateScheduleBox" class="${mode==='separate'?'':'hidden'}">
             <div class="notice notice-success" style="margin:0 0 10px"><strong>집중 진행 방식</strong> · 높은 우선순위 종별의 가능한 경기를 먼저 배정하고, 휴식 때문에 생긴 빈 코트는 다음 순위 종별로 채웁니다.</div>
             <div class="schedule-note" style="padding:0 0 8px"><strong>① 종별 운영 그룹 · 우선순위 지정</strong> · 같은 그룹 안에서는 1순위 종별을 먼저 진행하지만, 코트를 비워두기 위해 다른 종별을 억지로 늦추지는 않습니다.</div>
             <div class="schedule-group-assignment">${assignmentRows}</div>
-            <div class="schedule-note" style="padding:2px 0 6px"><strong>② 그룹별 시간표 설정</strong> · 최소 휴식, 결승 전 휴식, 결승 코트를 그룹마다 다르게 지정할 수 있습니다.</div>
+            <div class="schedule-note" style="padding:2px 0 6px"><strong>② 그룹별 시간표 설정</strong> · 종별 별도 진행에서는 최소 휴식, 결승 전 휴식, 결승 코트를 그룹마다 다르게 지정할 수 있습니다.</div>
             <div class="schedule-group-settings">${groupRows}</div>
           </div>
           <div class="schedule-actions">
@@ -2516,11 +2570,25 @@
             <span class="schedule-validation ${validation.length?'bad':'ok'}">${validation.length ? `⚠ 검증 오류 ${validation.length}건` : '✓ 타임테이블 검증 완료'}</span>
           </div>
         </div>
+        </div>
       </div>`;
     }
 
     function bindScheduleEvents() {
       const rerender = msg => { timetableCache = {key:'',bundle:null}; saveState(); renderResults(); if(msg) toast(msg); };
+
+      $('scheduleCollapseBtn')?.addEventListener('click', () => {
+        const s = normalizeSchedule();
+        s.panelCollapsed = !s.panelCollapsed;
+        saveState();
+        const body = $('schedulePanelBody');
+        const btn = $('scheduleCollapseBtn');
+        body?.classList.toggle('hidden', s.panelCollapsed);
+        if (btn) {
+          btn.textContent = s.panelCollapsed ? '펼치기 ▼' : '접기 ▲';
+          btn.setAttribute('aria-expanded', s.panelCollapsed ? 'false' : 'true');
+        }
+      });
 
       $('scheduleShowDetails')?.addEventListener('change', e => {
         normalizeSchedule().showDetails = Boolean(e.target.checked);
